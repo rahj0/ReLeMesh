@@ -6,13 +6,19 @@ Created on Thu Oct 11 21:21:21 2018
 """
 
 from tkinter import *
+import sys
+
+sys.path.append('environments')
+sys.path.append('gameObjects')
+sys.path.append('worldGenerators')
+
 from SimpleSquareWithTriObjsEnv import *
 from SimpleSquareWithTriObjsEnvSecond import *
 from MeshEnvViewer import *
 import itertools
 from tempfile import TemporaryFile
       
-sizeOfFrame = 23
+sizeOfFrame = 31
    
 cornerMovement = [[0,0],[0,0],[0,0],[0,0]]
 solidTipMovement = (2,0)
@@ -47,12 +53,12 @@ print(len(settingsList))
 print(len(settingsList[1]))
 
 showGUI = False
-showGUI = True
+# showGUI = True
 
 yLabels = []
 pixels = []
 iSample = 0
-settingsList = [settingsList[0]]
+# settingsList = [settingsList[0]]
 for settings in settingsList:
     cornerMovement = [[settings[0],settings[1]],[settings[2],settings[3]],[settings[4],settings[5]],[settings[6],settings[7]]]
     solidTipMovement = (settings[8],settings[9])
@@ -81,7 +87,7 @@ for settings in settingsList:
         if(showGUI):
             master = Tk()
             viewer = meshEnvViewer(master,env,20)
-            master.state('zoomed')
+            # master.state('zoomed')
             mainloop()
             
 print(len(settingsList))

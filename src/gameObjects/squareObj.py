@@ -4,6 +4,7 @@ Created on Wed Oct 10 23:18:37 2018
 
 @author: Rasmus
 """
+
 from gameObj import *
 
 class squareObj(gameOb):

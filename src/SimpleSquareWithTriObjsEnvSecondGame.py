@@ -77,10 +77,10 @@ if 1:
     extension = "_" + str(sizeOfFrame+2)+ "x"+ str(sizeOfFrame+2)+"_" +str(npLabels.shape[0]) + ".dat"
     
     #np.savetxt('labels' + extension, npLabels, fmt='%d')
-    fh1 = open('Problem2_labels' + extension, "bw")
+    fh1 = open('..\data\Problem2_labels' + extension, "bw")
     npLabels.tofile(fh1)
     
-    fh2 = open('Problem2_pixels' + extension, "bw")
+    fh2 = open('..\data\Problem2_pixels' + extension, "bw")
     npPixels.tofile(fh2)
     fh2.close()
     #

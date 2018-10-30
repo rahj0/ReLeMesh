@@ -74,18 +74,7 @@ class SimpleSquareWithTriObjsEnv(AbstractMeshEnv):
         xLines = 1
         yLines = 1
 
-        if 0:
-            obj = WorldGeneratorForInitialConvNetworkTest(self._cornerMovement, self._solidTipMovement,self._solidPosition, self._gameObjPosIncrement, self._gapFilled)
-        else:
-            gameObjIndexX = 1
-            gameObjIndexY = 0
-            realCorner = 3
-            slashSame = False
-            horiMove = [1,0]
-            vertMove = [0,-1]
-            obj = WorldGeneratorForSecondConvNetworkTest(gameObjIndexX, gameObjIndexY,
-                             realCorner, slashSame, horiMove, vertMove)
-
+        obj = WorldGeneratorForInitialConvNetworkTest(self._cornerMovement, self._solidTipMovement,self._solidPosition, self._gameObjPosIncrement, self._gapFilled)
         obj.generate(self._xRes+2,self._yRes+2)
 
         self.objects.extend(obj.getObjects())

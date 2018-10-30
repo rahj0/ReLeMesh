@@ -18,7 +18,7 @@ from MeshEnvViewer import *
 import itertools
 from tempfile import TemporaryFile
       
-sizeOfFrame = 31
+sizeOfFrame = 26
    
 cornerMovement = [[0,0],[0,0],[0,0],[0,0]]
 solidTipMovement = (2,0)
@@ -29,23 +29,23 @@ gameObjTipMovementLength = 2
 # gameObj tip direction - int (0-4) 0: No MoveMent 1: South 2: West, 3: North, 4: East
 gameObjTipDirection = 1 #
 
-stepsForCornersSWx = [0] #= [0,3]
+stepsForCornersSWx = [0,3] #= [0,3]
 stepsForCornersNWx = [0] #= [0,3]
-stepsForCornersNEx = [0] #= [0,3]
-stepsForCornersSEx = [0] #= [0,3]
-stepsForCornersSWy = [0] #= [0,3]
+stepsForCornersNEx = [0,1] #= [0,3]
+stepsForCornersSEx = [0,2] #= [0,3]
+stepsForCornersSWy = [0,3] #= [0,3]
 stepsForCornersNWy = [0] #= [0,3]
-stepsForCornersNEy = [0] #= [0,3]
+stepsForCornersNEy = [0,1] #= [0,3]
 stepsForCornersSEy = [0] #= [0,3]
 stepsForTipMovementsX = [-3,3] #= [0,3]
 stepsForTipMovementsY = [-3,3] #= [0,3]
-solidPositions = [0] #= [0,1,2,3]
+solidPositions = [0,1,2,3] #= [0,1,2,3]
 gameObjPosIncrements = [1,2,3] #= [1,2,3]
 #cornerMovements = [stepsForTipMovementsX,stepsForTipMovementsY,stepsForTipMovementsX,stepsForTipMovementsY,stepsForTipMovementsX,stepsForTipMovementsY,stepsForTipMovementsX,stepsForTipMovementsY]
 #myCornerList = list(itertools.product(*cornerMovements))
 #print(myCornerList)
 gapFilled = [False,True] # = [False, True] 
-gameObjTipMovementLengths = [1,2,4] # = [1,2]
+gameObjTipMovementLengths = [1,2] # = [1,2]
 gameObjTipDirections = [0,1,2,3,4] # = [0,1,2,3,4] 
 a = [stepsForCornersSWx,stepsForCornersSWy,stepsForCornersNWx,stepsForCornersNWy,stepsForCornersNEx,stepsForCornersNEy,stepsForCornersSEx,stepsForCornersSEy,stepsForTipMovementsX,stepsForTipMovementsY,solidPositions,gameObjPosIncrements,gapFilled,gameObjTipMovementLengths,gameObjTipDirections]
 settingsList = list(itertools.product(*a))
@@ -102,10 +102,10 @@ print(npPixels.shape)
 extension = "_" + str(sizeOfFrame+2)+ "x"+ str(sizeOfFrame+2)+"_" +str(npLabels.shape[0]) + ".dat"
 
 #np.savetxt('labels' + extension, npLabels, fmt='%d')
-fh1 = open('labels' + extension, "bw")
+fh1 = open('../data/labels' + extension, "bw")
 npLabels.tofile(fh1)
 
-fh2 = open('pixels' + extension, "bw")
+fh2 = open('../data/pixels' + extension, "bw")
 npPixels.tofile(fh2)
 fh2.close()
 #

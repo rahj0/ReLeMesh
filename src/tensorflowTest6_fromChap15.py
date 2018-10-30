@@ -261,16 +261,16 @@ def readData(nSamples, sizeOfFrame):
     y_labels = 1
     extension = "_" + str(sizeOfFrame)+ "x"+ str(sizeOfFrame)+"_" +str(nSamples) + ".dat"
     
-    
-    labels = np.fromfile('labels' + extension, dtype=np.int32)
-    pixels = np.fromfile('pixels' + extension, dtype=np.float32)
+    dataDir = "../data/"
+    labels = np.fromfile(dataDir + 'labels' + extension, dtype=np.int32)
+    pixels = np.fromfile(dataDir + 'pixels' + extension, dtype=np.float32)
     
     return (pixels,labels)
 
 #from tensorflow.examples.tutorials.mnist import input_data
 #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
-nSamples = 39936
+nSamples = 27648
 sizeOfFrame = 28
 nPixels = sizeOfFrame*sizeOfFrame
     
@@ -341,7 +341,7 @@ with g.as_default():
     tf.set_random_seed(random_seed)
     ## build the graph
     build_cnn()
-
+path
     ## saver:
     saver = tf.train.Saver()
 
@@ -349,13 +349,7 @@ nEpochs = 10
 
 with tf.Session(graph=g) as sess:
     print("start training")
-    
-#    train(sess, 
-#          training_set=(X_train_centered, y_train), 
-#          validation_set=(X_valid_centered, y_valid), 
-#          initialize=True,
-#          epochs = nEpochs,
-#          random_seed=123)
+
     train(sess, 
           training_set=(X_train_centered, y_train), 
           validation_set=(X_valid_centered, y_valid), 

@@ -103,6 +103,7 @@ class AbstractMeshEnv():
         raise
     
     def checkStartObject():
+        raise
         nextIsInvalid = True
         while(nextIsInvalid):
             nextObj = self.startObjects[0]

@@ -7,8 +7,7 @@ Created on Thu Jun 21 19:36:09 2018
 
 from tkinter import *
 import numpy as np
-sys.path.append('environments')
-from meshWorld import *
+
 
 class meshEnvViewer():
     def __init__(self, master, env, lineDistance = 20):

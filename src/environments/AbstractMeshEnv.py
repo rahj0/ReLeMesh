@@ -207,13 +207,13 @@ class AbstractMeshEnv():
         
     
     def computePixelsFromLine(self,x1,y1,x2,y2):
-#        print("computePixelsFromLine")
+       #print("computePixelsFromLine")
         lengthX = x2-x1
         lengthY = y2-y1
-#        print("lengthX",lengthX)
-#        print("lengthY",lengthY)
+       #print("lengthX",lengthX)
+       #print("lengthY",lengthY)
         lengthMax = max(abs(lengthX),abs(lengthY))
-#        print("max ", lengthMax)
+       #print("max ", lengthMax)
         xOdd = (lengthX % 2 != 0 )
         yOdd = (lengthY % 2 != 0 )
         maxOdd = (lengthMax % 2 != 0 )
@@ -342,8 +342,8 @@ class AbstractMeshEnv():
                         
             (xMove,yMove) = self.calculateXYmoveUnitVector(southEastCornerX,southEastCornerY,
             northEastCornerX,northEastCornerY) 
-#            yMove *= -1
-#            xMove *= -1
+            #yMove *= -1
+            #xMove *= -1
             if abs(xMove)+abs(yMove) > 0:
                 for i in range(len(pixelsEast))[1:-1]:
                     move = True
@@ -382,18 +382,18 @@ class AbstractMeshEnv():
         reward,done1 = self.checkGoal()
         self._score += penalty
         if reward == None:
-#            print(done)
-#            print(reward)
-#            print(penalty)
+           #print(done)
+           #print(reward)
+           #print(penalty)
             return self.getState(),(reward+penalty),done
         else:
             return self.getState(),(reward+penalty),done
  
 def doAction(action, states, env):
     (state,reward,done) =env.step(action)
-#    print(reward)
+    #print(reward)
     a = env.renderEnv()
-#    print(state)
+    #print(state)
     states = np.concatenate([states,a],axis=1)
     return states
 

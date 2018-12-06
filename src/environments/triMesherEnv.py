@@ -42,7 +42,66 @@ class triMesherEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
-        
+    def cleanupStarterObjects(self, newObject):
+        north = self.objects[-1].getNorthWest()
+        southWest = self.objects[-1].getSouthWest()
+        southEast = self.objects[-1].getSouthEast()
+
+        pixels = []
+        pixels.extend(self.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]))
+        pixels.extend(self.computePixelsFromLine(southEast[0],southEast[1],north[0],north[1]))
+
+        objectsToDelete = []
+
+        for startObject in self.startObjects:
+            northWest = startObject.getNorthWest()
+            northEast = startObject.getNorthEast()
+            eastFound = False
+            westFound = False
+            for pixel in pixels:
+                if northWest[0] == pixel[0] and northWest[1] == pixel[1]: #can we compare directly ?
+                    westFound = True
+                if northEast[0] == pixel[0] and northEast[1] == pixel[1]: #can we compare directly ?
+                    eastFound = True
+            if eastFound and westFound:
+                objectsToDelete.append(startObject)
+        for objectToDelete in objectsToDelete:
+             self.startObjects.remove(objectToDelete)
+
+
+
+    def convertHeroToStartObjects(self): 
+        north = self.objects[-1].getNorthWest()
+        southWest = self.objects[-1].getSouthWest()
+        southEast = self.objects[-1].getSouthEast()
+        self.cleanupStarterObjects(self.objects[-1])
+        channel = 1
+        valueNorth = self._state[north[0],north[1],channel]
+        valueSouthWest = self._state[southWest[0],southWest[1],channel]
+        valueSouthEast = self._state[southEast[0],southEast[1],channel]
+        print(valueSouthEast)
+        print(valueSouthWest)
+        print(valueNorth)
+
+        westObj = lineOb(southWest,north)
+        eastObj = lineOb(north,southEast)
+
+        if((valueNorth == 0.0) or (valueSouthWest == 0.0)):
+            self.startObjects.append(westObj)
+        else:
+            for pixel in self.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]):
+                if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
+                    self.startObjects.append(westObj)
+                    break
+
+        if((valueNorth == 0.0) or (valueSouthEast == 0.0)):
+            self.startObjects.append(eastObj)
+        else:
+            for pixel in self.computePixelsFromLine(north[0],north[1],southEast[0],southEast[1]):
+                if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
+                    self.startObjects.append(eastObj)
+                    break
+
     def createNewHero(self):
 
         starter = self.startObjects[0]

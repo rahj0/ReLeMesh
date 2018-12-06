@@ -80,24 +80,29 @@ class AbstractMeshEnv():
         hero.setNorthWest(northWestX,northWestY)
         hero.setNorthEast(northEastX,northEastY)
         return hero,outOfBound
-    
+
+    def convertHeroToStartObjects(self):       
+        northWest = self.objects[-1].getNorthWest()
+        northEast = self.objects[-1].getNorthEast()
+        channel = 1
+        valueWest = self._state[northWest[0],northWest[1],channel]
+        valueEast = self._state[northEast[0],northEast[1],channel]
+        if((valueWest == 0.0) or (valueEast == 0.0)):
+            self.startObjects.append(self.objects[-1])
+            return
+        else:
+            for pixel in self.computePixelsFromLine(northWest[0],northWest[1],northEast[0],northEast[1]):
+                if(self._state[pixel[0],pixel[1],1] == 0.0 ):
+                    self.startObjects.append(self.objects[-1])
+                    return
+
     def saveHeroAsWall(self):
         self.objects[-1].channel = 1
         self._score += self.objects[-1].calculateReward()
         if (self._nHeros > 0):
-            northWest = self.objects[-1].getNorthWest()
-            northEast = self.objects[-1].getNorthEast()
-            channel = 1
-            valueWest = self._state[northWest[0],northWest[1],channel]
-            valueEast = self._state[northEast[0],northEast[1],channel]
-            if((valueWest == 0.0) or (valueEast == 0.0)):
-                self.startObjects.append(self.objects[-1])
-                return
-            else:
-                for pixel in self.computePixelsFromLine(northWest[0],northWest[1],northEast[0],northEast[1]):
-                    if(self._state[pixel[0],pixel[1],1] == 0.0 ):
-                        self.startObjects.append(self.objects[-1])
-                        return
+            self.convertHeroToStartObjects()
+        return
+
 
     def createNewHero(self):
         raise

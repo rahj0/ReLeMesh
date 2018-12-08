@@ -27,7 +27,7 @@ class triMesherEnv(AbstractMeshEnv):
     def __init__(self,partial,size, seedValue = 0):
         AbstractMeshEnv.__init__(self, partial, size, seedValue)
         
-    def reset(self):
+    def resetConcreteClassSpecifics(self):
         self.objects = []
         
         xLines = 3
@@ -42,6 +42,7 @@ class triMesherEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
+        
     def cleanupStarterObjects(self, newObject):
         north = self.objects[-1].getNorthWest()
         southWest = self.objects[-1].getSouthWest()
@@ -109,7 +110,7 @@ class triMesherEnv(AbstractMeshEnv):
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
             reward += rewardPerCorner
         return reward   
-        
+
     def createNewHero(self):
 
         starter = self.startObjects[0]

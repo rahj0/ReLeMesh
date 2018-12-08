@@ -29,7 +29,7 @@ class meshEnv(AbstractMeshEnv):
     def __init__(self,partial,size, seedValue = 0):
         AbstractMeshEnv.__init__(self, partial, size, seedValue)
         
-    def reset(self):
+    def resetConcreteClassSpecifics(self):
         self.objects = []
         
         xLines = 3

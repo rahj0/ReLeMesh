@@ -49,15 +49,7 @@ class triObj(gameOb):
         
     def setNorthEast(self, x, y):
         self._northEast = (x,y)
-        self._northWest = (x,y)
-
-    def calculateFinishedObjectBonusReward(self):
-        (northEastCornerX,northEastCornerY) = self.objects[-1].getNorthEast()
-        reward = 0.0
-        rewardPerCorner = 10.0
-        if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
-            reward += rewardPerCorner
-        return reward      
+        self._northWest = (x,y)   
 
     def isNewShapeValid(self):
 #        return True

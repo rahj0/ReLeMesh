@@ -68,7 +68,7 @@ class SimpleSquareWithTriObjsEnvSecond(AbstractMeshEnv):
 
         return (gameObjTipMoveX,gameObjTipMoveY)
     
-    def reset(self):
+    def resetConcreteClassSpecifics(self):
         self.objects = []
         
         xLines = 1

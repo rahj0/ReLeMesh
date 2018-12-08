@@ -33,6 +33,7 @@ class AbstractMeshEnv():
         self.partial = partial
         self._seed = seedValue
         self._score = 0
+        self._lastHeroScore = 0.0
 #        self._a = []
         self.reset()
 #        plt.imshow(a,interpolation="nearest")
@@ -47,7 +48,10 @@ class AbstractMeshEnv():
         self._seed = seedValue
         
     def reset(self):
-        raise 
+        self.resetConcreteClassSpecifics()
+        
+    def resetConcreteClassSpecifics(self):
+        raise
     
     def resizeObjToFitEnv(self,hero):
         outOfBound = False
@@ -152,16 +156,16 @@ class AbstractMeshEnv():
 
         reward = 0.0
         if direction == 8:
-            reward = self.calculateFinishedObjectBonusReward()
+            reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0):
                 hero= self.createNewHero() 
             else:
-#                print("done")
                 done = True
         else:
             hero.changeNorthEast(changeNorthWestX,changeNorthWestY)            
             hero.changeNorthWest(changeNorthEastX,changeNorthEastY)
+            reward += 0.0
                         
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
         

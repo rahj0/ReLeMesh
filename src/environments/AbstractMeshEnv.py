@@ -49,9 +49,8 @@ class AbstractMeshEnv():
     def setSeed(seedValue):
         self._seed = seedValue
 
-    @abstractmethod
     def getMaxNumberOfHeros(self):
-        pass
+        raise
 
     def reset(self):
         self.resetConcreteClassSpecifics()

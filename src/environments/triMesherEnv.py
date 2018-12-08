@@ -27,16 +27,16 @@ class triMesherEnv(AbstractMeshEnv):
     ''' Create Mesh Environment using triangles.
     :param size: Number of pixels in x and y direction
     '''
-    def __init__(self,size, seedValue = 0):
+    def __init__(self,size, seedValue = 0, nLinesY = 3, nLinesX = 3):
+        self._nLinesX = nLinesX
+        self._nLinesY = nLinesY
         AbstractMeshEnv.__init__(self, False, size, seedValue)
+
         
     def resetConcreteClassSpecifics(self):
         self.objects = []
-        
-        xLines = 3
-        yLines = 3
 
-        obj = simpleMeshWorldGenerator(xLines, yLines, 2, 2)
+        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 2, 2)
         obj.generate(self._xRes+2,self._yRes+2)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
@@ -45,6 +45,9 @@ class triMesherEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
+
+    def getMaxNumberOfHeros(self):
+        return self._nLinesX * self._nLinesY * 2
 
     def getIdealObjectArea(self,x,y):
         nObjects = 9*2

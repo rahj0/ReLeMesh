@@ -55,7 +55,19 @@ class gameOb():
         if (angle2 < angle1):
             angle += 360.0
         return angle
+    def getArea(self):
+        x1 = self._southWest[0]
+        y1 = self._southWest[1]
+        x2 = self._northEast[0]
+        y2 = self._northEast[1]
+        x3 = self._southEast[0]
+        y3 = self._southEast[1]
+        return 0.0
 
+    def getBonusValue(self):
+        bonusValue = 0
+        bonusValue += self.getArea()
+        return bonusValue
     
     def isNewShapeValid(self):
         return True

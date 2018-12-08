@@ -44,7 +44,10 @@ class meshEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
-        
+    def getIdealObjectArea(self,x,y):
+        nObjects = 9 
+        return self._yRes * self._xRes / nObjects
+
     def createNewHero(self):
 
         starter = self.startObjects[0]

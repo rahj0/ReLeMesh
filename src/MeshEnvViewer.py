@@ -29,10 +29,11 @@ class meshEnvViewer():
            height=self._canvasPxelHeight)
         self._canvas.grid(row=1,column=1)
         self.createEmptyGrid()
+        self._score = env.getStartScore()
         env.renderEnv()
         self.paintState(env.getState())
         
-        self._score = 0.0
+        
         self._scoreLabel = Label(self.score_frame, text="Score: 0.0")
         self._scoreLabel.grid(row=0,column=0)
        

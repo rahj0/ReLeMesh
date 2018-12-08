@@ -36,6 +36,7 @@ class AbstractMeshEnv():
         self._seed = seedValue
         self._score = 0
         self._lastHeroScore = 0.0
+        self._currentBonusValue = 0.0
 #        self._a = []
         self.reset()
 #        plt.imshow(a,interpolation="nearest")
@@ -51,7 +52,11 @@ class AbstractMeshEnv():
         
     def reset(self):
         self.resetConcreteClassSpecifics()
+        self._currentBonusValue = self.objects[-1].getBonusValue()
         
+    def getStartScore(self):
+        return self._currentBonusValue
+
     def resetConcreteClassSpecifics(self):
         raise
     
@@ -156,18 +161,25 @@ class AbstractMeshEnv():
         elif direction == 7:
             changeNorthEastY = -1
 
-        reward = 0.0
+        reward = -0.1
         if direction == 8:
             reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0):
                 hero= self.createNewHero() 
+                self._currentBonusValue = hero.getBonusValue() 
+                reward += self._currentBonusValue 
+                        
             else:
                 done = True
         else:
-            hero.changeNorthEast(changeNorthWestX,changeNorthWestY)            
-            hero.changeNorthWest(changeNorthEastX,changeNorthEastY)
-            reward += 0.0
+            hero.changeNorthEast(changeNorthWestX, changeNorthWestY)            
+            hero.changeNorthWest(changeNorthEastX, changeNorthEastY)
+            idealArea = self.getIdealObjectArea(0,0)
+            actualArea = hero.getArea()
+            newBonusValue = idealArea - abs(actualArea-idealArea)
+            reward += newBonusValue- self._currentBonusValue 
+            self._currentBonusValue = newBonusValue
                         
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
         

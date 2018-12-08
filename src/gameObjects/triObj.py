@@ -51,6 +51,15 @@ class triObj(gameOb):
         self._northEast = (x,y)
         self._northWest = (x,y)   
 
+    def getArea(self):
+        x1 = self._southWest[0]
+        y1 = self._southWest[1]
+        x2 = self._northEast[0]
+        y2 = self._northEast[1]
+        x3 = self._southEast[0]
+        y3 = self._southEast[1]
+        return abs(0.5*(abs(x2-x1)*abs(y3-y1)-abs(x3-x1)*abs(y2-y1)))
+
     def isNewShapeValid(self):
 #        return True
         angleTolerance = 1e-6

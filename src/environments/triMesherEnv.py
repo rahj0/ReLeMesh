@@ -45,7 +45,11 @@ class triMesherEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
-        
+
+    def getIdealObjectArea(self,x,y):
+        nObjects = 9*2
+        return self._yRes * self._xRes / nObjects
+
     def cleanupStarterObjects(self, newObject):
         north = self.objects[-1].getNorthWest()
         southWest = self.objects[-1].getSouthWest()

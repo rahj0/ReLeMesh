@@ -165,9 +165,6 @@ class gameOb():
     def getSouthEast(self):
         return self._southEast
     
-
-
-    
 def calculateAngle(originPoint, secondPoint):
     difX =secondPoint[0] - originPoint[0]
     difY =secondPoint[1] - originPoint[1]

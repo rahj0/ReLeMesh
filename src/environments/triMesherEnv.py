@@ -48,8 +48,8 @@ class triMesherEnv(AbstractMeshEnv):
         southEast = self.objects[-1].getSouthEast()
 
         pixels = []
-        pixels.extend(self.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]))
-        pixels.extend(self.computePixelsFromLine(southEast[0],southEast[1],north[0],north[1]))
+        pixels.extend(BasicEnvironmentRender.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]))
+        pixels.extend(BasicEnvironmentRender.computePixelsFromLine(southEast[0],southEast[1],north[0],north[1]))
 
         objectsToDelete = []
 
@@ -89,7 +89,7 @@ class triMesherEnv(AbstractMeshEnv):
         if((valueNorth == 0.0) or (valueSouthWest == 0.0)):
             self.startObjects.append(westObj)
         else:
-            for pixel in self.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]):
+            for pixel in BasicEnvironmentRender.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]):
                 if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
                     self.startObjects.append(westObj)
                     break
@@ -97,11 +97,19 @@ class triMesherEnv(AbstractMeshEnv):
         if((valueNorth == 0.0) or (valueSouthEast == 0.0)):
             self.startObjects.append(eastObj)
         else:
-            for pixel in self.computePixelsFromLine(north[0],north[1],southEast[0],southEast[1]):
+            for pixel in BasicEnvironmentRender.computePixelsFromLine(north[0],north[1],southEast[0],southEast[1]):
                 if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
                     self.startObjects.append(eastObj)
                     break
 
+    def calculateFinishedObjectBonusReward(self):
+        (northEastCornerX,northEastCornerY) = self.objects[-1].getNorthEast()
+        reward = 0.0
+        rewardPerCorner = 10.0
+        if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
+            reward += rewardPerCorner
+        return reward   
+        
     def createNewHero(self):
 
         starter = self.startObjects[0]

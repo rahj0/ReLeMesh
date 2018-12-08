@@ -32,6 +32,7 @@ class meshEnvViewer():
         env.renderEnv()
         self.paintState(env.getState())
         
+        self._score = 0.0
         self._scoreLabel = Label(self.score_frame, text="Score: 0.0")
         self._scoreLabel.grid(row=0,column=0)
        
@@ -72,10 +73,10 @@ class meshEnvViewer():
         if action == 8:
             indexAdd = 0
         (state,reward,done) = self._env.step(action+indexAdd)
+        self._score += reward
         self.clearCanvas()
         self.paintState(state)
-        score = self._env.getScore()
-        scorText = "Score: " + str(score)
+        scorText = "Score: " + str(self._score)
         self._scoreLabel.config(text=scorText)
         if(done):
             self._gaveOver = True

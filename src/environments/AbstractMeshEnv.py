@@ -23,7 +23,7 @@ from BasicEnvironmentRender import *
 from MeshWorldGenerator import *
 
 class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0):
+    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 20):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         self._nHeros = 0
@@ -34,12 +34,11 @@ class AbstractMeshEnv():
         self.startObjects = []
         self.partial = partial
         self._seed = seedValue
+        self._cornerMatchBonus = cornerMatchBonus
         self._score = 0
         self._lastHeroScore = 0.0
         self._currentBonusValue = 0.0
-#        self._a = []
         self.reset()
-#        plt.imshow(a,interpolation="nearest")
         
     def getSizeX(self):
         return self._xRes 
@@ -49,7 +48,11 @@ class AbstractMeshEnv():
         return self._state
     def setSeed(seedValue):
         self._seed = seedValue
-        
+
+    @abstractmethod
+    def getMaxNumberOfHeros(self):
+        pass
+
     def reset(self):
         self.resetConcreteClassSpecifics()
         self._currentBonusValue = self.objects[-1].getBonusValue()
@@ -57,6 +60,7 @@ class AbstractMeshEnv():
     def getStartScore(self):
         return self._currentBonusValue
 
+    @abstractmethod
     def resetConcreteClassSpecifics(self):
         raise
     
@@ -128,11 +132,10 @@ class AbstractMeshEnv():
         (northWestCornerX,northWestCornerY) = self.objects[-1].getNorthWest()
         (northEastCornerX,northEastCornerY) = self.objects[-1].getNorthEast()
         reward = 0.0
-        rewardPerCorner = 10.0
         if self._state[northWestCornerX,northWestCornerY,1] == 1.0:
-            reward += rewardPerCorner
+            reward += self._cornerMatchBonus
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
-            reward += rewardPerCorner
+            reward += self._cornerMatchBonus
         return reward            
     
     def moveChar(self,direction):

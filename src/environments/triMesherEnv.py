@@ -113,9 +113,8 @@ class triMesherEnv(AbstractMeshEnv):
     def calculateFinishedObjectBonusReward(self):
         (northEastCornerX,northEastCornerY) = self.objects[-1].getNorthEast()
         reward = 0.0
-        rewardPerCorner = 10.0
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
-            reward += rewardPerCorner
+            reward += self._cornerMatchBonus
         return reward   
 
     def createNewHero(self):

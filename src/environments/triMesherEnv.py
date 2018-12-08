@@ -24,8 +24,11 @@ from simpleMeshWorldGenerator import *
 from AbstractMeshEnv import *
 
 class triMesherEnv(AbstractMeshEnv):
-    def __init__(self,partial,size, seedValue = 0):
-        AbstractMeshEnv.__init__(self, partial, size, seedValue)
+    ''' Create Mesh Environment using triangles.
+    :param size: Number of pixels in x and y direction
+    '''
+    def __init__(self,size, seedValue = 0):
+        AbstractMeshEnv.__init__(self, False, size, seedValue)
         
     def resetConcreteClassSpecifics(self):
         self.objects = []

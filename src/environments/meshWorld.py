@@ -26,8 +26,8 @@ from simpleMeshWorldGenerator import *
 from AbstractMeshEnv import *
 
 class meshEnv(AbstractMeshEnv):
-    def __init__(self,partial,size, seedValue = 0):
-        AbstractMeshEnv.__init__(self, partial, size, seedValue)
+    def __init__(self,size, seedValue = 0):
+        AbstractMeshEnv.__init__(self, False, size, seedValue)
         
     def resetConcreteClassSpecifics(self):
         self.objects = []

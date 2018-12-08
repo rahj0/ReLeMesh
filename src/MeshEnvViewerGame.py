@@ -15,10 +15,10 @@ from triMesherEnv import *
 tri = input('TriMesh (y/n):')
 if tri == "y":
     pass
-    env = triMesherEnv(partial=False,size=25, seedValue=2)
+    env = triMesherEnv(size=25, seedValue=2)
 else:
     print("Using Quads")
-    env = meshEnv(partial=False,size=25, seedValue=2)
+    env = meshEnv(size=25, seedValue=2)
 master = Tk()
 viewer = meshEnvViewer(master,env,20)
 

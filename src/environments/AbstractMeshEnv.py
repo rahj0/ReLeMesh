@@ -24,6 +24,8 @@ from MeshWorldGenerator import *
 
 class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0):
+        if size < 4:
+            raise ValueError('Size of Environment is too small.')
         self._nHeros = 0
         self._xRes = size
         self._yRes = size

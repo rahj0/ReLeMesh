@@ -38,6 +38,7 @@ class AbstractMeshEnv():
         self._score = 0
         self._lastHeroScore = 0.0
         self._currentBonusValue = 0.0
+        self._done = False
         self.reset()
         
     def getSizeX(self):
@@ -138,6 +139,8 @@ class AbstractMeshEnv():
         return reward            
     
     def moveChar(self,direction):
+        if self._done:
+            return 0, True
         # 0 - up, 1 - down, 2 - left, 3 - right
         hero = self.objects[-1]
         heroBackup = self.objects[-1]
@@ -167,8 +170,9 @@ class AbstractMeshEnv():
         if direction == 8:
             reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
-            if (len(self.startObjects) > 0):
+            if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
                 hero= self.createNewHero() 
+                self._nHeros += 1
                 self._currentBonusValue = hero.getBonusValue() 
                 reward += self._currentBonusValue 
                         

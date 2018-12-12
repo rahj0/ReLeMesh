@@ -23,7 +23,7 @@ from BasicEnvironmentRender import *
 from MeshWorldGenerator import *
 
 class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
+    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 200):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         self._nHeros = 0
@@ -162,7 +162,7 @@ class AbstractMeshEnv():
         elif direction == 8:
             newHero = True
         return (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) 
-        
+
     def moveChar(self,direction):
         if self._done:
             return 0, True
@@ -178,7 +178,8 @@ class AbstractMeshEnv():
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
                 print(self._nHeros)
                 hero= self.createNewHero() 
-                self._nHeros += 1      
+                self._nHeros += 1   
+                
             else:
                 done = True
         else:
@@ -187,12 +188,15 @@ class AbstractMeshEnv():
 
                         
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
+
+        if newHero:
+            self._currentBonusValue = self.countFilledPixels() 
         self.renderEnv()
 
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
-        newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.20)
+        newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.50)
         print(pow(abs(actualArea-idealArea),1.5))
         print(actualArea)
         reward += newBonusValue- self._currentBonusValue 

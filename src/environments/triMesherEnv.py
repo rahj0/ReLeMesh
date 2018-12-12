@@ -80,6 +80,23 @@ class triMesherEnv(AbstractMeshEnv):
              self.startObjects.remove(objectToDelete)
 
 
+    def convertStepInput(self,direction):
+        changeNorthWestX = 0
+        changeNorthWestY = 0
+        changeNorthEastX = 0
+        changeNorthEastY = 0
+        newHero = False
+        if direction == 0:
+            changeNorthWestX = 1
+        elif direction == 1:
+            changeNorthWestX = -1
+        elif direction == 2:
+            changeNorthWestY = 1
+        elif direction == 3:
+            changeNorthWestY = -1
+        elif direction == 4 or direction == 8: # 8 is used by the viewer
+            newHero = True
+        return (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) 
 
     def convertHeroToStartObjects(self): 
         north = self.objects[-1].getNorthWest()

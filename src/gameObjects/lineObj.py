@@ -4,7 +4,7 @@ Created on Wed Oct 10 23:17:59 2018
 
 @author: Rasmus
 """
-from squareObj import *
+from gameObjects.squareObj import *
 
 class lineOb(squareObj):
     def __init__(self,coord1,coord2):

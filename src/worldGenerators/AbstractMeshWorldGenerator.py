@@ -7,7 +7,7 @@ Created on Tue Sep 11 22:39:57 2018
 
 
 import random
-from lineObj import *
+from gameObjects.lineObj import *
 
 class AbstractMeshWorldGenerator():
     def __init__(self, deviationProbability):

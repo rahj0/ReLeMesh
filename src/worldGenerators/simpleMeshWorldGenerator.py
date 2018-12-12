@@ -4,8 +4,8 @@ Created on Thu Oct 11 20:16:09 2018
 
 @author: Rasmus
 """
-from lineObj import *
-from AbstractMeshWorldGenerator import *
+from gameObjects.lineObj import *
+from worldGenerators.AbstractMeshWorldGenerator import *
 
 class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
     def __init__(self, xSize, ySize, maxDeviationX, maxDeviationY, deviationProbability = 0.4):

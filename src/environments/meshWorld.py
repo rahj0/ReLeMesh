@@ -12,18 +12,16 @@ Created on Tue May  8 22:44:07 2018
 @author: Rasmus
 """
 import sys
-sys.path.append('gameObjects')
-sys.path.append('worldGenerators')
 import numpy as np
 import random
 import itertools
 import scipy.misc
 from abc import abstractmethod
-from squareObj import *
-from quadObj import *
+from gameObjects.squareObj import *
+from gameObjects.quadObj import *
 
-from simpleMeshWorldGenerator import *
-from AbstractMeshEnv import *
+from worldGenerators.simpleMeshWorldGenerator import *
+from environments.AbstractMeshEnv import *
 
 class meshEnv(AbstractMeshEnv):
     def __init__(self,size, seedValue = 0, nLinesX = 3, nLinesY = 3):

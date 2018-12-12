@@ -1,7 +1,7 @@
 
 import numpy as np
-from squareObj import *
-from triObj import *
+from gameObjects.squareObj import *
+from gameObjects.triObj import *
 
 class BasicEnvironmentRender():
     def __init__(self, xRes, yRes ):

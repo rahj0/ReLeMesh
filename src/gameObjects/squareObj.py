@@ -5,7 +5,7 @@ Created on Wed Oct 10 23:18:37 2018
 @author: Rasmus
 """
 
-from gameObj import *
+from gameObjects.gameObj import *
 
 class squareObj(gameOb):
     def __init__(self,coord,size,intensity,channel,reward,name):

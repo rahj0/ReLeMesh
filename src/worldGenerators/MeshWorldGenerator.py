@@ -5,7 +5,7 @@ Created on Tue Sep 11 22:39:57 2018
 @author: Rasmus
 """
 
-from lineObj import *
+from gameObjects.lineObj import *
 import random
 
 class AbstractMeshWorldGenerator():

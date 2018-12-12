@@ -4,7 +4,7 @@ Created on Wed Oct 10 23:17:07 2018
 
 @author: Rasmus
 """
-from gameObj import *
+from gameObjects.gameObj import *
 
 class quadObj(gameOb):
     def __init__(self,coord1,coord2,intensity,channel,reward,name):

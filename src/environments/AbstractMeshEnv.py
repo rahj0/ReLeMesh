@@ -17,10 +17,10 @@ import random
 import itertools
 import scipy.misc
 from abc import abstractmethod
-from squareObj import *
-from triObj import *
-from BasicEnvironmentRender import *
-from MeshWorldGenerator import *
+from gameObjects.squareObj import *
+from gameObjects.triObj import *
+from environments.Rendering.BasicEnvironmentRender import *
+from worldGenerators.MeshWorldGenerator import *
 
 class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 200):
@@ -185,8 +185,7 @@ class AbstractMeshEnv():
         else:
             hero.changeNorthEast(changeNorthWestX, changeNorthWestY)            
             hero.changeNorthWest(changeNorthEastX, changeNorthEastY)
-
-                        
+       
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
 
         if newHero:
@@ -202,7 +201,6 @@ class AbstractMeshEnv():
         reward += newBonusValue- self._currentBonusValue 
         self._currentBonusValue = newBonusValue
 
-        
         self.objects[-1] = hero
 
         return reward,done

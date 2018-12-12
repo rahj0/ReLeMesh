@@ -12,16 +12,15 @@ Created on Tue May  8 22:44:07 2018
 @author: Rasmus
 """
 import sys
-sys.path.append('gameObjects')
-sys.path.append('worldGenerators')
+
 import numpy as np
 import random
 import itertools
 import scipy.misc
 from abc import abstractmethod
-from triObj import *
-from simpleMeshWorldGenerator import *
-from AbstractMeshEnv import *
+from gameObjects.triObj import *
+from worldGenerators.simpleMeshWorldGenerator import *
+from environments.AbstractMeshEnv import *
 
 class triMesherEnv(AbstractMeshEnv):
     ''' Create Mesh Environment using triangles.

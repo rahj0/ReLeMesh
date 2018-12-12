@@ -60,6 +60,5 @@ class meshEnv(AbstractMeshEnv):
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
     
         self.objects.append(hero)
-        self._nHeros += 1
         return hero
     

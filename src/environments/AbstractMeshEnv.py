@@ -23,7 +23,7 @@ from BasicEnvironmentRender import *
 from MeshWorldGenerator import *
 
 class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 20):
+    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         self._nHeros = 0
@@ -137,18 +137,12 @@ class AbstractMeshEnv():
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
             reward += self._cornerMatchBonus
         return reward            
-    
-    def moveChar(self,direction):
-        if self._done:
-            return 0, True
-        # 0 - up, 1 - down, 2 - left, 3 - right
-        hero = self.objects[-1]
-        heroBackup = self.objects[-1]
-        done = False
+    def convertStepInput(self,direction):
         changeNorthWestX = 0
         changeNorthWestY = 0
         changeNorthEastX = 0
         changeNorthEastY = 0
+        newHero = False
         if direction == 0:
             changeNorthWestX = 1
         elif direction == 1:
@@ -165,38 +159,62 @@ class AbstractMeshEnv():
             changeNorthEastY = 1
         elif direction == 7:
             changeNorthEastY = -1
-
+        elif direction == 8:
+            newHero = True
+        return (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) 
+        
+    def moveChar(self,direction):
+        if self._done:
+            return 0, True
+        # 0 - up, 1 - down, 2 - left, 3 - right
+        hero = self.objects[-1]
+        heroBackup = self.objects[-1]
+        done = False
+        (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
         reward = -0.1
-        if direction == 8:
+        if newHero:
             reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
+                print(self._nHeros)
                 hero= self.createNewHero() 
-                self._nHeros += 1
-                self._currentBonusValue = hero.getBonusValue() 
-                reward += self._currentBonusValue 
-                        
+                self._nHeros += 1      
             else:
                 done = True
         else:
             hero.changeNorthEast(changeNorthWestX, changeNorthWestY)            
             hero.changeNorthWest(changeNorthEastX, changeNorthEastY)
-            idealArea = self.getIdealObjectArea(0,0)
-            actualArea = hero.getArea()
-            newBonusValue = idealArea - abs(actualArea-idealArea)
-            reward += newBonusValue- self._currentBonusValue 
-            self._currentBonusValue = newBonusValue
+
                         
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
+        self.renderEnv()
+
+        idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
+        actualArea = hero.getArea()
         
-        if self.renderEnv():
-            self.objects[-1] = hero
-        else:
-            hero.changeNorthEast(-changeNorthWestX,-changeNorthWestY)            
-            hero.changeNorthWest(-changeNorthEastX,-changeNorthEastY)  
-            self.objects[-1] = hero
+        newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.20)
+        print(pow(abs(actualArea-idealArea),1.5))
+        print(actualArea)
+        reward += newBonusValue- self._currentBonusValue 
+        self._currentBonusValue = newBonusValue
+
+        
+        self.objects[-1] = hero
+
         return reward,done
- 
+        
+    def countFilledPixels(self):
+        print(self._state.shape)
+        count = 0
+        for i in range(self._state.shape[0]):
+            for j in range(self._state.shape[0]):
+                if self._state[i,j,1] > 0.0:
+                    count += 1
+                elif self._state[i,j,2] > 0.0:
+                    count += 1
+        print(count)
+        return count 
+
     def renderEnv(self):
         render = BasicEnvironmentRender(self._xRes, self._yRes)
 

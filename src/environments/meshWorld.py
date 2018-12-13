@@ -54,7 +54,7 @@ class meshEnv(AbstractMeshEnv):
         starter = self.startObjects[0]
         self.startObjects.pop(0)
         
-        hero = quadObj(starter.getNorthWest(),starter.getNorthEast(),1,2,None,'hero')
+        hero = quadObj(starter.getNorthWest(),starter.getNorthEast(),1,0,None,'hero')
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
     
         self.objects.append(hero)

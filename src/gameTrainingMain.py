@@ -20,14 +20,15 @@ import time
 from environments.triMesherEnv import triMesherEnv
 
 sizeEnv = 26
+nChannels = 2
 env = triMesherEnv(size=(sizeEnv-2))
 print(env.actions)
 class Qnetwork():
     def __init__(self,h_size):
         #The network recieves a frame from the game, flattened into an array.
         #It then resizes it and processes it through four convolutional layers.
-        self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*3],dtype=tf.float32)
-        self.imageIn = tf.reshape(self.scalarInput,shape=[-1,sizeEnv,sizeEnv,3])
+        self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*nChannels],dtype=tf.float32)
+        self.imageIn = tf.reshape(self.scalarInput,shape=[-1,sizeEnv,sizeEnv,nChannels])
         self.conv1 = slim.conv2d( \
             inputs=self.imageIn,num_outputs=32,kernel_size=[5,5],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv1.shape)    
@@ -81,7 +82,7 @@ class experience_buffer():
         return np.reshape(np.array(random.sample(self.buffer,size)),[size,5])
     
 def processState(states):
-    return np.reshape(states,[sizeEnv*sizeEnv*3])
+    return np.reshape(states,[sizeEnv*sizeEnv*nChannels])
 
 
 def updateTargetGraph(tfVars,tau):
@@ -100,7 +101,7 @@ update_freq = 4 #How often to perform a training step.
 y = .99 #Discount factor on the target Q-values
 startE = 1 #Starting chance of random action
 endE = 0.1 #Final chance of random action
-annealing_steps = 4000. #How many steps of training to reduce startE to endE.
+annealing_steps = 10000. #How many steps of training to reduce startE to endE.
 num_episodes = 10000 #How many episodes of game environment to train network with.
 pre_train_steps = 10000 #How many steps of random actions before training begins.
 max_epLength = 50 #The max allowed length of our episode.

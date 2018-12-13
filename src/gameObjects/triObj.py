@@ -66,11 +66,11 @@ class triObj(gameOb):
         minAngle = 0 + angleTolerance
         southWestAngle =self.calculateSouthWestCornerAngle()
         if southWestAngle > maxAngle or southWestAngle < minAngle:
-            print("Not valid because of south west corner angle")
+            # print("Not valid because of south west corner angle")
             return False
         southEastAngle = self.calculateSouthEastCornerAngle()
         if southEastAngle > maxAngle or southEastAngle < minAngle:
-            print("Not valid because of south east corner angle")
+            # print("Not valid because of south east corner angle")
             return False
 #        northWestAngle =self.calculateNorthWestCornerAngle()
 #        if northWestAngle > maxAngle or northWestAngle < minAngle:

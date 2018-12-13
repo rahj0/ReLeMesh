@@ -100,7 +100,7 @@ class BasicEnvironmentRender():
     def renderEnv(self, objects):
         bufferX = 0
         bufferY = 0
-        a = np.zeros([self._yRes+2,self._xRes+2,3])
+        a = np.zeros([self._yRes+2,self._xRes+2,2])
         maxIndexX = self._yRes+1
         maxIndexY = self._xRes+1
 
@@ -208,6 +208,5 @@ class BasicEnvironmentRender():
                         j +=1 
         b = a[:,:,0]
         c = a[:,:,1]
-        d = a[:,:,2]
 
-        return [True,np.stack([b,c,d],axis=2)]
+        return [True,np.stack([b,c],axis=2)]

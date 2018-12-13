@@ -203,7 +203,7 @@ class AbstractMeshEnv():
         self._currentBonusValue = newBonusValue
 
         self.objects[-1] = hero
-        print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
+        # print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
         return reward,done
         
     def countFilledPixels(self):
@@ -212,7 +212,7 @@ class AbstractMeshEnv():
             for j in range(self._state.shape[0]):
                 if self._state[i,j,1] > 0.0:
                     count += 1
-                elif self._state[i,j,2] > 0.0:
+                elif self._state[i,j,0] > 0.0:
                     count += 1
         return count 
 

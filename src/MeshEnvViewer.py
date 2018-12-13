@@ -110,7 +110,7 @@ class meshEnvViewer():
         self.clearCanvas()
         self.createEmptyGrid()
 
-        for colorBand in range(state.shape[2]):
+        for colorBand in reversed(range(state.shape[2])):
             for i in range(self._canvasWidth):
                 for j in range(self._canvasHeight):
                     if (state[i,j,colorBand] != 0):
@@ -140,7 +140,7 @@ class meshEnvViewer():
         y0 = (self._canvasHeight - indexY)*self._lineDistance
     #    y0 = (indexY + 1)*squareSize
         colorID = "yellow"
-        if color == 0:
+        if color == 2:
             colorID = "blue"
         elif color == 1:
             colorID = "#1a8a1a"
@@ -148,7 +148,7 @@ class meshEnvViewer():
                 colorID = "#aacdaa"
             elif intensity < 1.0:
                 colorID = "#72ad72"
-        elif color == 2:
+        elif color == 0:
             colorID = "#ff0f0f"
             if intensity < 0.70:
                 colorID = "#ffbbbb"

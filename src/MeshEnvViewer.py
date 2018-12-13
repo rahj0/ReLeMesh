@@ -10,7 +10,7 @@ import numpy as np
 
 
 class meshEnvViewer():
-    def __init__(self, master, env, lineDistance = 20):
+    def __init__(self, master, env, lineDistance = 10):
         self._gameOver = False
         self._env = env
         self._master = master

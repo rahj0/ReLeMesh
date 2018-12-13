@@ -32,7 +32,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         southWestX = lastX
         southWestY = lastY
         
-        print("southWest to southEast")
+        # print("southWest to southEast")
         
         for i in range(self._xSize):
             newX = lastX + baseXLineLength
@@ -44,7 +44,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
             newY = minY + self.generateRandomDeviation(0,self._maxDeviationX)
             
             oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            print(lastX,lastY," - " ,newX,newY)
+            # print(lastX,lastY," - " ,newX,newY)
             
             lastY = newY
             lastX = newX
@@ -56,7 +56,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         lastX = southWestX
         lastY = southWestY
         
-        print("southWest to northWest")
+        # print("southWest to northWest")
         
         #### Y 
         for i in range(self._ySize):
@@ -69,7 +69,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
             newX = minX + self.generateRandomDeviation(0,self._maxDeviationX)
             
             oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            print(lastX,lastY," - " ,newX,newY)
+            # print(lastX,lastY," - " ,newX,newY)
             lastY = newY
             lastX = newX
             self._objects.append(oldObject1)    
@@ -77,7 +77,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         northWestX = lastX
         northWestY = lastY
 
-        print("northWest to northEast")
+        # print("northWest to northEast")
         for i in range(self._xSize):
             newX = lastX + baseXLineLength
             if i == self._xSize-1:
@@ -88,7 +88,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
             newY = maxY - self.generateRandomDeviation(0,self._maxDeviationX)
             
             oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            print(lastX,lastY," - " ,newX,newY)
+            # print(lastX,lastY," - " ,newX,newY)
             lastY = newY
             lastX = newX
             self._objects.append(oldObject1)   
@@ -98,7 +98,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         lastX = southEastX
         lastY = southEastY
 
-        print("southEast to northEast")    
+        # print("southEast to northEast")    
         for i in range(self._ySize):
             newY = lastY + baseYLineLength
             newX = maxX - self.generateRandomDeviation(0,self._maxDeviationX)
@@ -109,7 +109,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
                 newY += self.generateRandomDeviation(-self._maxDeviationY,self._maxDeviationY)
             
             oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            print(lastX,lastY," - " ,newX,newY)
+            # print(lastX,lastY," - " ,newX,newY)
             lastY = newY
             lastX = newX
             self._objects.append(oldObject1)    

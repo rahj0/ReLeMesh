@@ -113,30 +113,25 @@ class gameOb():
     
     def changeNorthWest(self,xChange, yChange):
         oldCoordinate = self._northWest
-        print(self._northWest[0],self._northWest[1])
         self._northWest = (self._northWest[0]+xChange,self._northWest[1]+yChange)
         if not self.isNewShapeValid():
             self._northWest = oldCoordinate
 
     def changeNorthEast(self,xChange, yChange):
         oldCoordinate = self._northEast
-        print(self._northEast[0],self._northEast[1])
         self._northEast = (self._northEast[0]+xChange,self._northEast[1]+yChange)
-        self.printAngles()
         if not self.isNewShapeValid():
             self._northEast = oldCoordinate   
             
     def changeSouthWest(self,xChange, yChange):
         oldCoordinate = self._southWest
         self._southWest = (self._southWest[0]+xChange,self._southWest[1]+yChange)
-        self.printAngles()
         if not self.isNewShapeValid():
             self._northEast = oldCoordinate 
             
     def changeSouthEast(self,xChange, yChange):
         oldCoordinate = self._southEast
         self._southEast = (self._southEast[0]+xChange,self._southEast[1]+yChange)
-        self.printAngles()
         if not self.isNewShapeValid():
             self._southEast = oldCoordinate 
             
@@ -201,8 +196,3 @@ def calculateAngle(originPoint, secondPoint):
     #   /   45 ish deg
     #  /______
     
-
-point1 = [0.0,0.0]
-point2 = [1.0,-1.0]
-    
-print((calculateAngle(point1,point2)))

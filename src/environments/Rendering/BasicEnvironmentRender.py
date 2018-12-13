@@ -129,7 +129,7 @@ class BasicEnvironmentRender():
                 if [northEastCornerX,northEastCornerY] in pixelsEast[:-1]:
                     wrongMove = True
                 if wrongMove:
-                    return False
+                    return [False, 0]
                 
             for pixel in pixelsWest:
                 a[pixel[0],pixel[1],item.channel] = item.intensity
@@ -210,4 +210,4 @@ class BasicEnvironmentRender():
         c = a[:,:,1]
         d = a[:,:,2]
 
-        return True,np.stack([b,c,d],axis=2)
+        return [True,np.stack([b,c,d],axis=2)]

@@ -37,7 +37,6 @@ class triObj(gameOb):
     def changeNorthEast(self,xChange, yChange):
         oldCoordinate = self._northEast
         self._northEast = (self._northEast[0]+xChange,self._northEast[1]+yChange)
-        self.printAngles()
         if not self.isNewShapeValid():
             self._northEast = oldCoordinate
         else:

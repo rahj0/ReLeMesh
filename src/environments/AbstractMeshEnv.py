@@ -26,19 +26,13 @@ class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 200):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
-        self._nHeros = 0
+        
         self._xRes = size
         self._yRes = size
-        self.actions = 4
-        self.objects = []
-        self.startObjects = []
+        self.actions = 5
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
-        self._score = 0
-        self._lastHeroScore = 0.0
-        self._currentBonusValue = 0.0
-        self._done = False
         self.reset()
         
     def getSizeX(self):
@@ -54,8 +48,18 @@ class AbstractMeshEnv():
         raise
 
     def reset(self):
+        self._nHeros = 0
+        self.objects = []
+        self.startObjects = []
+        self._score = 0
+        self._lastHeroScore = 0.0
+        self._currentBonusValue = 0.0
+        self._done = False
+
         self.resetConcreteClassSpecifics()
         self._currentBonusValue = self.objects[-1].getBonusValue()
+        self.renderEnv()  
+        return self._state
         
     def getStartScore(self):
         return self._currentBonusValue
@@ -176,7 +180,6 @@ class AbstractMeshEnv():
             reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
-                print(self._nHeros)
                 hero= self.createNewHero() 
                 self._nHeros += 1   
                 
@@ -189,24 +192,21 @@ class AbstractMeshEnv():
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
 
         if newHero:
-            self._currentBonusValue = self.countFilledPixels() 
+            self._currentBonusValue = 0 
         self.renderEnv()
 
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
         newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.50)
-        print(pow(abs(actualArea-idealArea),1.5))
-        print(actualArea)
         reward += newBonusValue- self._currentBonusValue 
         self._currentBonusValue = newBonusValue
 
         self.objects[-1] = hero
-
+        print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
         return reward,done
         
     def countFilledPixels(self):
-        print(self._state.shape)
         count = 0
         for i in range(self._state.shape[0]):
             for j in range(self._state.shape[0]):
@@ -214,14 +214,15 @@ class AbstractMeshEnv():
                     count += 1
                 elif self._state[i,j,2] > 0.0:
                     count += 1
-        print(count)
         return count 
 
     def renderEnv(self):
         render = BasicEnvironmentRender(self._xRes, self._yRes)
 
-        (status,self._state) =  render.renderEnv(self.objects)
-        return True
+        [status,state] =  render.renderEnv(self.objects)
+        if status:
+            self._state = state
+
     
     def step(self,action):
         reward,done = self.moveChar(action)

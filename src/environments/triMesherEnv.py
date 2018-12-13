@@ -42,8 +42,6 @@ class triMesherEnv(AbstractMeshEnv):
         
         hero = self.createNewHero()
         self.objects.append(hero)        
-#        
-        self._state = self.renderEnv()  
 
     def getMaxNumberOfHeros(self):
         return self._nLinesX * self._nLinesY * 2
@@ -106,9 +104,6 @@ class triMesherEnv(AbstractMeshEnv):
         valueNorth = self._state[north[0],north[1],channel]
         valueSouthWest = self._state[southWest[0],southWest[1],channel]
         valueSouthEast = self._state[southEast[0],southEast[1],channel]
-        print(valueSouthEast)
-        print(valueSouthWest)
-        print(valueNorth)
 
         westObj = lineOb(southWest,north)
         eastObj = lineOb(north,southEast)

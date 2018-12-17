@@ -13,11 +13,11 @@ from environments.triMesherEnv import *
 tri = input('TriMesh (y/n):')
 if tri == "y":
     pass
-    env = triMesherEnv(size=14, seedValue=2)
+    env = triMesherEnv(size=14, seedValue=2, nLinesX = 2, nLinesY=2)
 else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)
 master = Tk()
-viewer = meshEnvViewer(master,env,10)
+viewer = meshEnvViewer(master,env,20)
 
 mainloop()

@@ -35,7 +35,7 @@ class triMesherEnv(AbstractMeshEnv):
     def resetConcreteClassSpecifics(self):
         self.objects = []
 
-        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 2, 2)
+        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 0, 0)
         obj.generate(self._xRes+2,self._yRes+2)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
@@ -47,7 +47,7 @@ class triMesherEnv(AbstractMeshEnv):
         return self._nLinesX * self._nLinesY * 2
 
     def getIdealObjectArea(self,x,y):
-        nObjects = 9*2
+        nObjects = self._nLinesX *self._nLinesY *2
         return self._yRes * self._xRes / nObjects
 
     def cleanupStarterObjects(self, newObject):

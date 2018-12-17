@@ -29,8 +29,8 @@ class meshEnvViewer():
            height=self._canvasPxelHeight)
         self._canvas.grid(row=1,column=1)
         self.createEmptyGrid()
-        self._score = env.getStartScore()
-        env.renderEnv()
+        self._score = 0
+        env.reset()
         self.paintState(env.getState())
         
         
@@ -60,7 +60,11 @@ class meshEnvViewer():
         self._master.bind("<Left>", lambda e:self.callback_left())
         self._master.bind("<Right>", lambda e:self.callback_right())
         self._master.bind("<Return>", lambda e:self.callback_enter())
-        
+        self._master.bind("0", lambda e:self.callback_key0())
+        self._master.bind("1", lambda e:self.callback_key1())
+        self._master.bind("2", lambda e:self.callback_key2())
+        self._master.bind("3", lambda e:self.callback_key3())
+
         self.score_frame.pack()
         self.top_frame.pack()
 #        self.bottom_frame.pack()
@@ -74,6 +78,7 @@ class meshEnvViewer():
         if action == 8:
             indexAdd = 0
         (state,reward,done) = self._env.step(action+indexAdd)
+        print(reward)
         self._score += reward
         self.clearCanvas()
         self.paintState(state)
@@ -104,7 +109,21 @@ class meshEnvViewer():
     def callback_left(self):
         if not self._gameOver:
             self.doAction(1)
-
+    def callback_key0(self):
+        if not self._gameOver:
+            self.doAction(0)
+    def callback_key1(self):
+        if not self._gameOver:
+            self.doAction(1)
+    def callback_key2(self):
+        if not self._gameOver:
+            self.doAction(2)
+    def callback_key3(self):
+        if not self._gameOver:
+            self.doAction(3)
+    def callback_key4(self):
+        if not self._gameOver:
+            self.doAction(4)
 
     def paintState(self,state):
         self.clearCanvas()

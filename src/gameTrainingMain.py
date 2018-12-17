@@ -19,9 +19,10 @@ import time
 
 from environments.triMesherEnv import triMesherEnv
 
-sizeEnv = 26
+sizeEnv = 14
+# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
-env = triMesherEnv(size=(sizeEnv-2))
+env = triMesherEnv((sizeEnv-2), 0, 2, 2)
 print(env.actions)
 class Qnetwork():
     def __init__(self,h_size):
@@ -30,16 +31,16 @@ class Qnetwork():
         self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*nChannels],dtype=tf.float32)
         self.imageIn = tf.reshape(self.scalarInput,shape=[-1,sizeEnv,sizeEnv,nChannels])
         self.conv1 = slim.conv2d( \
-            inputs=self.imageIn,num_outputs=32,kernel_size=[5,5],stride=[2,2],padding='VALID', biases_initializer=None)
+            inputs=self.imageIn,num_outputs=128,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv1.shape)    
         self.conv2 = slim.conv2d( \
-            inputs=self.conv1,num_outputs=64,kernel_size=[4,4],stride=[1,1],padding='VALID', biases_initializer=None)
+            inputs=self.conv1,num_outputs=64,kernel_size=[3,3],stride=[1,1],padding='VALID', biases_initializer=None)
         print(self.conv2.shape)   
         self.conv3 = slim.conv2d( \
             inputs=self.conv2,num_outputs=64,kernel_size=[3,3],stride=[1,1],padding='VALID', biases_initializer=None)
         print(self.conv3.shape)   
         self.conv4 = slim.conv2d( \
-            inputs=self.conv3,num_outputs=h_size,kernel_size=[6,6],stride=[1,1],padding='VALID', biases_initializer=None)
+            inputs=self.conv3,num_outputs=h_size,kernel_size=[2,2],stride=[1,1],padding='VALID', biases_initializer=None)
         print(self.conv4.shape)   
         
         #We take the output from the final convolutional layer and split it into separate advantage and value streams.
@@ -69,7 +70,7 @@ class Qnetwork():
         self.updateModel = self.trainer.minimize(self.loss)
         
 class experience_buffer():
-    def __init__(self, buffer_size = 50000):
+    def __init__(self, buffer_size = 5000):
         self.buffer = []
         self.buffer_size = buffer_size
     
@@ -101,9 +102,9 @@ update_freq = 4 #How often to perform a training step.
 y = .99 #Discount factor on the target Q-values
 startE = 1 #Starting chance of random action
 endE = 0.1 #Final chance of random action
-annealing_steps = 10000. #How many steps of training to reduce startE to endE.
-num_episodes = 10000 #How many episodes of game environment to train network with.
-pre_train_steps = 10000 #How many steps of random actions before training begins.
+annealing_steps = 400000. #How many steps of training to reduce startE to endE.
+num_episodes = 300000 #How many episodes of game environment to train network with.
+pre_train_steps = 40000 #How many steps of random actions before training begins.
 max_epLength = 50 #The max allowed length of our episode.
 load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
@@ -137,7 +138,7 @@ total_steps = 0
 #Make a path for our model to be saved in.
 if not os.path.exists(path):
     os.makedirs(path)
-
+last_avg = 0
 with tf.Session() as sess:
     sess.run(init)
     if load_model == True:
@@ -195,8 +196,14 @@ with tf.Session() as sess:
         #Periodically save the model. 
         if i % 1000 == 0:
             saver.save(sess,path+'/model-'+str(i)+'.ckpt')
+            env.printStats()
             print("Saved Model")
         if len(rList) % 10 == 0:
             print(total_steps,np.mean(rList[-10:]), e)
+        if len(rList) % 500 == 0:
+            mean500 = np.mean(rList[-100:])
+            if last_avg > 0:
+                print("Average (100): ", mean500 , " Last:", last_avg)
+            last_avg = mean500
     saver.save(sess,path+'/model-'+str(i)+'.ckpt')
 print("Percent of succesful episodes: " + str(sum(rList)/num_episodes) + "%")

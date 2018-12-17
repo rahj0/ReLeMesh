@@ -33,6 +33,7 @@ class AbstractMeshEnv():
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
+        self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
         self.reset()
         
     def getSizeX(self):
@@ -46,8 +47,15 @@ class AbstractMeshEnv():
 
     def getMaxNumberOfHeros(self):
         raise
+    def printStats(self):
+        print("Steps:" + str(self._totalSteps))
+        print("Reward:" + str(self._totalReward))
+        print("Actions:" + str(self._actions))
 
     def reset(self):
+        self._actions = []
+        self._totalSteps = 0
+        self._totalReward = 0
         self._nHeros = 0
         self.objects = []
         self.startObjects = []
@@ -57,8 +65,14 @@ class AbstractMeshEnv():
         self._done = False
 
         self.resetConcreteClassSpecifics()
-        self._currentBonusValue = self.objects[-1].getBonusValue()
+        for gameObject in self.objects:
+            self.resizeObjToFitEnv(gameObject)
         self.renderEnv()  
+
+        actualArea = self.objects[-1].getArea()
+        self._currentBonusValue = self.countFilledPixels() - pow(abs(actualArea-self.getIdealObjectArea(0,0)),1.50)
+        self._currentBonusValue /= self._normaliseValue
+        self._totalReward += self._currentBonusValue 
         return self._state
         
     def getStartScore(self):
@@ -177,7 +191,6 @@ class AbstractMeshEnv():
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
         reward = -0.1
         if newHero:
-            reward += self.calculateFinishedObjectBonusReward()
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
                 hero= self.createNewHero() 
@@ -199,9 +212,10 @@ class AbstractMeshEnv():
         actualArea = hero.getArea()
         
         newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.50)
-        reward += newBonusValue- self._currentBonusValue 
-        self._currentBonusValue = newBonusValue
-
+        newBonusValue += self.calculateFinishedObjectBonusReward()
+        reward += newBonusValue- self._currentBonusValue* self._normaliseValue
+        self._currentBonusValue = newBonusValue / self._normaliseValue
+        reward = min(1.0, reward / self._normaliseValue)
         self.objects[-1] = hero
         # print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
         return reward,done
@@ -225,7 +239,10 @@ class AbstractMeshEnv():
 
     
     def step(self,action):
+        self._actions.append(action)
         reward,done = self.moveChar(action)
+        self._totalReward += reward
+        self._totalSteps += 1
         return self.getState(),reward,done
 
 def test():

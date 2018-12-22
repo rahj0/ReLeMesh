@@ -23,7 +23,7 @@ from environments.Rendering.BasicEnvironmentRender import *
 from worldGenerators.MeshWorldGenerator import *
 
 class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 200):
+    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         
@@ -51,6 +51,9 @@ class AbstractMeshEnv():
         print("Steps:" + str(self._totalSteps))
         print("Reward:" + str(self._totalReward))
         print("Actions:" + str(self._actions))
+
+    def getActions(self):
+        return self._actions
 
     def reset(self):
         self._actions = []
@@ -189,7 +192,7 @@ class AbstractMeshEnv():
         heroBackup = self.objects[-1]
         done = False
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
-        reward = -0.1
+        reward = 0
         if newHero:
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
@@ -215,9 +218,12 @@ class AbstractMeshEnv():
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
         self._currentBonusValue = newBonusValue / self._normaliseValue
-        reward = min(1.0, reward / self._normaliseValue)
+        # reward = min(2.0, reward / self._normaliseValue)
+        reward =  reward / self._normaliseValue
         self.objects[-1] = hero
         # print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
+        # if newHero:
+        #     reward = 0        
         return reward,done
         
     def countFilledPixels(self):

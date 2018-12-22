@@ -21,6 +21,7 @@ from abc import abstractmethod
 from gameObjects.triObj import *
 from worldGenerators.simpleMeshWorldGenerator import *
 from environments.AbstractMeshEnv import *
+from random import shuffle
 
 class triMesherEnv(AbstractMeshEnv):
     ''' Create Mesh Environment using triangles.
@@ -39,7 +40,7 @@ class triMesherEnv(AbstractMeshEnv):
         obj.generate(self._xRes+2,self._yRes+2)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
-        
+        shuffle(self.startObjects)
         hero = self.createNewHero()
         self.objects.append(hero)        
 
@@ -48,7 +49,7 @@ class triMesherEnv(AbstractMeshEnv):
 
     def getIdealObjectArea(self,x,y):
         nObjects = self._nLinesX *self._nLinesY *2
-        return self._yRes * self._xRes / nObjects
+        return (self._yRes+1) * (self._xRes+1) / nObjects
 
     def cleanupStarterObjects(self, newObject):
         north = self.objects[-1].getNorthWest()

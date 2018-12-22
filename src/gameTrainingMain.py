@@ -19,7 +19,7 @@ import time
 
 from environments.triMesherEnv import triMesherEnv
 
-sizeEnv = 14
+sizeEnv = 15
 # sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
 env = triMesherEnv((sizeEnv-2), 0, 2, 2)
@@ -34,13 +34,9 @@ class Qnetwork():
             inputs=self.imageIn,num_outputs=128,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv1.shape)    
         self.conv2 = slim.conv2d( \
-            inputs=self.conv1,num_outputs=64,kernel_size=[3,3],stride=[1,1],padding='VALID', biases_initializer=None)
-        print(self.conv2.shape)   
-        self.conv3 = slim.conv2d( \
-            inputs=self.conv2,num_outputs=64,kernel_size=[3,3],stride=[1,1],padding='VALID', biases_initializer=None)
-        print(self.conv3.shape)   
+            inputs=self.conv1,num_outputs=256,kernel_size=[3,3],stride=[2,2],padding='VALID', biases_initializer=None)
         self.conv4 = slim.conv2d( \
-            inputs=self.conv3,num_outputs=h_size,kernel_size=[2,2],stride=[1,1],padding='VALID', biases_initializer=None)
+            inputs=self.conv2,num_outputs=h_size,kernel_size=[2,2],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv4.shape)   
         
         #We take the output from the final convolutional layer and split it into separate advantage and value streams.
@@ -70,7 +66,7 @@ class Qnetwork():
         self.updateModel = self.trainer.minimize(self.loss)
         
 class experience_buffer():
-    def __init__(self, buffer_size = 5000):
+    def __init__(self, buffer_size = 10000):
         self.buffer = []
         self.buffer_size = buffer_size
     
@@ -97,13 +93,13 @@ def updateTarget(op_holder,sess):
     for op in op_holder:
         sess.run(op)
     
-batch_size = 32 #How many experiences to use for each training step.
-update_freq = 4 #How often to perform a training step.
+batch_size = 64 #How many experiences to use for each training step.
+update_freq = 8 #How often to perform a training step.
 y = .99 #Discount factor on the target Q-values
 startE = 1 #Starting chance of random action
 endE = 0.1 #Final chance of random action
-annealing_steps = 400000. #How many steps of training to reduce startE to endE.
-num_episodes = 300000 #How many episodes of game environment to train network with.
+annealing_steps = 500000. #How many steps of training to reduce startE to endE.
+num_episodes = 80000 #How many episodes of game environment to train network with.
 pre_train_steps = 40000 #How many steps of random actions before training begins.
 max_epLength = 50 #The max allowed length of our episode.
 load_model = False #Whether to load a saved model.
@@ -139,6 +135,9 @@ total_steps = 0
 if not os.path.exists(path):
     os.makedirs(path)
 last_avg = 0
+maxScore = 0
+last_max500 = 0
+bestActions = []
 with tf.Session() as sess:
     sess.run(init)
     if load_model == True:
@@ -187,7 +186,10 @@ with tf.Session() as sess:
             s = s1
             
             if d == True:
-
+                if rAll > maxScore:
+                    env.printStats()
+                    maxScore = rAll
+                    bestActions = env.getActions()
                 break
         
         myBuffer.add(episodeBuffer.buffer)
@@ -196,14 +198,20 @@ with tf.Session() as sess:
         #Periodically save the model. 
         if i % 1000 == 0:
             saver.save(sess,path+'/model-'+str(i)+'.ckpt')
-            env.printStats()
             print("Saved Model")
-        if len(rList) % 10 == 0:
-            print(total_steps,np.mean(rList[-10:]), e)
+            print("i: ", i)
+            print("e: ", e)
+        # if len(rList) % 100 == 0:
+        #     print(total_steps,np.mean(rList[-100:]), e)
         if len(rList) % 500 == 0:
-            mean500 = np.mean(rList[-100:])
+            mean500 = np.mean(rList[-500:])
+            max500 = np.max(rList[-500:])
             if last_avg > 0:
-                print("Average (100): ", mean500 , " Last:", last_avg)
+                print("Average (500): ", mean500 , " Last:", last_avg)
+            print("Max (500): ", max500 , " Last:", last_max500)
             last_avg = mean500
+            last_max500 = max500
     saver.save(sess,path+'/model-'+str(i)+'.ckpt')
 print("Percent of succesful episodes: " + str(sum(rList)/num_episodes) + "%")
+print("Best Score: ", maxScore)
+print("Best Score Action list: ", bestActions)

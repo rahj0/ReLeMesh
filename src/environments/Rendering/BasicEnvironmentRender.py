@@ -142,10 +142,13 @@ class BasicEnvironmentRender():
                             
             for pixel in pixelsSouth:
                 a[pixel[0],pixel[1],item.channel] = item.intensity
-             
-            a[pixelsWest[0][0],pixelsWest[0][1],item.channel] = 1
+
+            if item.channel == 1: 
+                a[pixelsWest[0][0],pixelsWest[0][1],item.channel] = 1
+                a[pixelsEast[0][0],pixelsEast[0][1],item.channel] = 1
+            
+            
             a[pixelsWest[-1][0],pixelsWest[-1][1],item.channel] = 1
-            a[pixelsEast[0][0],pixelsEast[0][1],item.channel] = 1
             a[pixelsEast[-1][0],pixelsEast[-1][1],item.channel] = 1
                         
             # Inside square

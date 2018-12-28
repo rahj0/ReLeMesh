@@ -10,10 +10,11 @@ from MeshEnvViewer import *
 from environments.meshWorld import *
 from environments.triMesherEnv import *
 
-tri = input('TriMesh (y/n):')
+# tri = input('TriMesh (y/n):')
+tri = "y"
 if tri == "y":
     pass
-    env = triMesherEnv(size=13, seedValue=2, nLinesX = 2, nLinesY=2)
+    env = triMesherEnv(size=14, seedValue=2, nLinesX = 3, nLinesY=3)
 else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)

@@ -59,7 +59,7 @@ class AbstractMeshEnv():
         self._actions = []
         self._totalSteps = 0
         self._totalReward = 0
-        self._nHeros = 0
+        self._nHeros = 1
         self.objects = []
         self.startObjects = []
         self._score = 0
@@ -73,9 +73,8 @@ class AbstractMeshEnv():
         self.renderEnv()  
 
         actualArea = self.objects[-1].getArea()
-        self._currentBonusValue = self.countFilledPixels() - pow(abs(actualArea-self.getIdealObjectArea(0,0)),1.50)
+        self._currentBonusValue = actualArea- pow(abs(actualArea-self.getIdealObjectArea(0,0)),1.50)
         self._currentBonusValue /= self._normaliseValue
-        self._totalReward += self._currentBonusValue 
         return self._state
         
     def getStartScore(self):
@@ -192,7 +191,7 @@ class AbstractMeshEnv():
         heroBackup = self.objects[-1]
         done = False
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
-        reward = 0
+        reward = -2.0
         if newHero:
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
@@ -214,7 +213,7 @@ class AbstractMeshEnv():
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
-        newBonusValue = self.countFilledPixels() - pow(abs(actualArea-idealArea),1.50)
+        newBonusValue = actualArea- pow(abs(actualArea-idealArea),1.50)
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
         self._currentBonusValue = newBonusValue / self._normaliseValue
@@ -223,7 +222,7 @@ class AbstractMeshEnv():
         self.objects[-1] = hero
         # print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
         # if newHero:
-        #     reward = 0        
+        #     reward = 0    
         return reward,done
         
     def countFilledPixels(self):

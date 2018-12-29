@@ -29,13 +29,15 @@ class AbstractMeshEnv():
         
         self._xRes = size
         self._yRes = size
+        self._nChannels = 2
         self.actions = 5
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
         self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
         self.reset()
-        
+    def getNumberOfChannels(self):
+        return self._nChannels
     def getSizeX(self):
         return self._xRes 
     def getSizeY(self):

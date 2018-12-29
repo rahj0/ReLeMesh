@@ -22,7 +22,7 @@ sizeEnv = 15
 nChannels = 2
 
 class Qnetwork():
-    def __init__(self,h_size):
+    def __init__(self,h_size,envActions,sizeEnv,nChannels):
         #The network recieves a frame from the game, flattened into an array.
         #It then resizes it and processes it through four convolutional layers.
         self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*nChannels],dtype=tf.float32)
@@ -42,7 +42,7 @@ class Qnetwork():
         self.streamA = slim.flatten(self.streamAC)
         self.streamV = slim.flatten(self.streamVC)
         xavier_init = tf.contrib.layers.xavier_initializer()
-        self.AW = tf.Variable(xavier_init([h_size//2,5]))
+        self.AW = tf.Variable(xavier_init([h_size//2,envActions]))
         self.VW = tf.Variable(xavier_init([h_size//2,1]))
         self.Advantage = tf.matmul(self.streamA,self.AW)
         self.Value = tf.matmul(self.streamV,self.VW)
@@ -54,7 +54,7 @@ class Qnetwork():
         #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
         self.targetQ = tf.placeholder(shape=[None],dtype=tf.float32)
         self.actions = tf.placeholder(shape=[None],dtype=tf.int32)
-        self.actions_onehot = tf.one_hot(self.actions,5,dtype=tf.float32)
+        self.actions_onehot = tf.one_hot(self.actions,envActions,dtype=tf.float32)
         
         self.Q = tf.reduce_sum(tf.multiply(self.Qout, self.actions_onehot), axis=1)
         
@@ -76,7 +76,7 @@ class experience_buffer():
     def sample(self,size):
         return np.reshape(np.array(random.sample(self.buffer,size)),[size,5])
     
-def processState(states):
+def processState(states,sizeEnv,nChannels):
     return np.reshape(states,[sizeEnv*sizeEnv*nChannels])
 
 

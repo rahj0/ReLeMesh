@@ -43,8 +43,8 @@ bufferSize = 100000
 
 
 tf.reset_default_graph()
-mainQN = Qnetwork(h_size)
-targetQN = Qnetwork(h_size)
+mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
+targetQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
 
 init = tf.global_variables_initializer()
 
@@ -84,7 +84,7 @@ with tf.Session() as sess:
         episodeBuffer = experience_buffer()
         #Reset environment and get first new observation
         s = env.reset()
-        s = processState(s)
+        s = processState(s, sizeEnv, env.getNumberOfChannels())
         d = False
         rAll = 0
         j = 0
@@ -93,15 +93,15 @@ with tf.Session() as sess:
             j+=1
             #Choose an action by greedily (with e chance of random action) from the Q-network
             if np.random.rand(1) < e or total_steps < pre_train_steps:
-                a = np.random.randint(0,5)
+                a = np.random.randint(0,env.actions)
             else:
                 a = sess.run(mainQN.predict,feed_dict={mainQN.scalarInput:[s]})[0]
             
             start = time.time()
             s1,r,d = env.step(a)
             envRenderTime += time.time() - start
-
-            s1 = processState(s1)
+            
+            s1 = processState(s1, sizeEnv, env.getNumberOfChannels())
             total_steps += 1
             episodeBuffer.add(np.reshape(np.array([s,a,r,s1,d]),[1,5])) #Save the experience to our episode buffer.
             

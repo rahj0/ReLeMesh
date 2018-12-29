@@ -31,6 +31,7 @@ class triMesherEnv(AbstractMeshEnv):
         self._nLinesX = nLinesX
         self._nLinesY = nLinesY
         AbstractMeshEnv.__init__(self, False, size, seedValue)
+        self.actions = 9
 
         
     def resetConcreteClassSpecifics(self):
@@ -92,7 +93,19 @@ class triMesherEnv(AbstractMeshEnv):
             changeNorthWestY = 1
         elif direction == 3:
             changeNorthWestY = -1
-        elif direction == 4 or direction == 8: # 8 is used by the viewer
+        elif direction == 4:          
+            changeNorthWestX = 1
+            changeNorthWestY = 1
+        elif direction == 5:
+            changeNorthWestX = -1
+            changeNorthWestY = 1
+        elif direction == 6:
+            changeNorthWestX = 1
+            changeNorthWestY = -1
+        elif direction == 7:
+            changeNorthWestX = -1
+            changeNorthWestY = -1
+        elif direction == 8: # 8 is used by the viewer
             newHero = True
         return (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) 
 

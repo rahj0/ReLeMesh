@@ -28,13 +28,12 @@ print(env.actions)
     
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
-h_size = 128 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
+h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 num_episodes = 1
 max_epLength = 50
 
 tf.reset_default_graph()
-mainQN = Qnetwork(h_size)
-targetQN = Qnetwork(h_size)
+mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
 
 init = tf.global_variables_initializer()
 
@@ -58,7 +57,7 @@ with tf.Session() as sess:
     for i in range(num_episodes):
 
         s = env.reset()
-        s = processState(s)
+        s = processState(s, sizeEnv, env.getNumberOfChannels())
         d = False
         rAll = 0
         j = 0
@@ -72,7 +71,7 @@ with tf.Session() as sess:
             actions_.append(a)
             start = time.time()
             s,r,d = env.step(a)
-            s = processState(s)
+            s = processState(s, sizeEnv, env.getNumberOfChannels())
             envRenderTime += time.time() - start
             if d == True:
                 break

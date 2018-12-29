@@ -63,7 +63,7 @@ class meshEnvViewer():
         self._master.bind("0", lambda e:self.callback_key0())
         self._master.bind("1", lambda e:self.callback_key1())
         self._master.bind("2", lambda e:self.callback_key2())
-        self._master.bind("3", lambda e:self.callback_key3())
+        self._master.bind("KP_3", lambda e:self.callback_key3())
 
         self.score_frame.pack()
         self.top_frame.pack()

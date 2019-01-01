@@ -14,6 +14,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         self._ySize = ySize
         self._maxDeviationX = maxDeviationX
         self._maxDeviationY = maxDeviationY
+        self._idealAverageSquareArea = self._xSize * self._ySize 
 
     def generate(self, worldSizeX, worldSizeY):
         minX = 0

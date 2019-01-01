@@ -16,6 +16,7 @@ class AbstractMeshWorldGenerator():
         self._deviationProbability = deviationProbability
         self._objects = []
         self._startObjects = []
+        self._idealAverageSquareArea = 0.0
         
     def generateRandomDeviation(self,minDeviation, maxDeviation ):
         if int(random.randint(0, 100)) < int(self._deviationProbability):
@@ -30,7 +31,12 @@ class AbstractMeshWorldGenerator():
     
     def generate(self, worldSizeX, worldSizeY):
         raise
-        
+
+    def getIdealAverageSquareArea(self):
+        if _idealAverageObjectArea <= 0.0:
+            raise
+        return _idealAverageSquareArea
+
     def generateBorder(self,minX, minY, maxX, maxY, cornerMovement = [[0,0],[0,0],[0,0],[0,0]]):
                 
         southWestX = minX + cornerMovement[0][0]

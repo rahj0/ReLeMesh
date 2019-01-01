@@ -2,6 +2,6 @@ data
 *.pyc
 src/model
 .vscode
-src/dqn
+src/dqn*
 src/tut
 

@@ -20,21 +20,21 @@ import time
 from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
-sizeEnv = 15
+sizeEnv = 16
 # sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
-env = triMesherEnv((sizeEnv-2), 0, 2, 2)
+env = triMesherEnv((sizeEnv-2), 0, 3, 3)
 print(env.actions)
     
 batch_size = 32 #How many experiences to use for each training step.
 update_freq = 4 #How often to perform a training step.
-y = .80 #Discount factor on the target Q-values
-startE = 0.7 #Starting chance of random action
-endE = 0.0 #Final chance of random action
-annealing_steps = 3000000. #How many steps of training to reduce startE to endE.
-num_episodes = 100000 #How many episodes of game environment to train network with.
-pre_train_steps = 100000 #How many steps of random actions before training begins.
-max_epLength = 50 #The max allowed length of our episode.
+y = .90 #Discount factor on the target Q-values
+startE = 0.8 #Starting chance of random action
+endE = 0.05 #Final chance of random action
+annealing_steps = 2000000. #How many steps of training to reduce startE to endE.
+num_episodes = 40000 #How many episodes of game environment to train network with.
+pre_train_steps = 20000 #How many steps of random actions before training begins.
+max_epLength = 150 #The max allowed length of our episode.
 load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.

@@ -26,7 +26,7 @@ class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
-        
+        self._overlappingPixelPenalty = 8
         self._xRes = size
         self._yRes = size
         self._nChannels = 2
@@ -215,7 +215,9 @@ class AbstractMeshEnv():
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
-        newBonusValue = actualArea- pow(abs(actualArea-idealArea),1.50)
+        newBonusValue = actualArea 
+        newBonusValue -= pow(abs(actualArea-idealArea),1.50) 
+        newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
         self._currentBonusValue = newBonusValue / self._normaliseValue
@@ -237,6 +239,16 @@ class AbstractMeshEnv():
                     count += 1
         return count 
 
+    def countOverlappingPixels(self):
+        count = 0
+        for i in range(self._state.shape[0]):
+            for j in range(self._state.shape[0]):
+                value = self._state[i,j,0]
+                if value > 0.0:
+                    if value < 0.51: # TODO: Remove hardcoded value
+                        if self._state[i,j,1] > 0.0:
+                            count += 1
+        return count
     def renderEnv(self):
         render = BasicEnvironmentRender(self._xRes, self._yRes)
 

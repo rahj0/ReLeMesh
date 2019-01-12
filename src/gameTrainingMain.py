@@ -21,7 +21,6 @@ from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
 sizeEnv = 16
-# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
 env = triMesherEnv((sizeEnv-2), 0, 3, 3)
 print(env.actions)
@@ -29,19 +28,23 @@ print(env.actions)
 batch_size = 32 #How many experiences to use for each training step.
 update_freq = 4 #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
-startE = 0.8 #Starting chance of random action
-endE = 0.001 #Final chance of random action
-annealing_steps = 2400000. #How many steps of training to reduce startE to endE.
-num_episodes = 30000 #How many episodes of game environment to train network with.
+startE = 0.9 #Starting chance of random action
+endE = 0.01 #Final chance of random action
 
-max_epLength = 100 #The max allowed length of our episode.
+num_episodes = 80000 #How many episodes of game environment to train network with.
+max_epLength = 110 #The max allowed length of our episode.
+
+annealing_steps_ratio = 0.8
+annealing_steps = int(num_episodes*max_epLength*annealing_steps_ratio)
+ #How many steps of training to reduce startE to endE.
+print("Annealing steps: ", annealing_steps)
+
 load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 tau = 0.001 #Rate to update target network toward primary   
 bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.
-
 
 tf.reset_default_graph()
 mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())

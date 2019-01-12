@@ -26,15 +26,16 @@ class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
-        self._overlappingPixelPenalty = 8
+        self._overlappingPixelPenalty = 20
         self._xRes = size
         self._yRes = size
         self._nChannels = 2
-        self.actions = 5
+        self.actions = 9
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
         self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
+        self._render = BasicEnvironmentRender(self._xRes, self._yRes)
         self.reset()
     def getNumberOfChannels(self):
         return self._nChannels
@@ -210,13 +211,18 @@ class AbstractMeshEnv():
 
         if newHero:
             self._currentBonusValue = 0 
-        self.renderEnv()
+            self.renderEnv()
+        else:
+            self.refreshEnv()
 
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
         newBonusValue = actualArea 
-        newBonusValue -= pow(abs(actualArea-idealArea),1.50) 
+        newBonusValue -= pow(abs(actualArea-idealArea),1.5) 
+        print()
+        print("Area: ",actualArea)
+        print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
         newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
@@ -250,12 +256,16 @@ class AbstractMeshEnv():
                             count += 1
         return count
     def renderEnv(self):
-        render = BasicEnvironmentRender(self._xRes, self._yRes)
-
-        [status,state] =  render.renderEnv(self.objects)
+        [status,state] =  self._render.renderEnv(self.objects)
         if status:
             self._state = state
+            # self._state[0] = state[0]
+            # self._state[1] = state[1]
 
+    def refreshEnv(self):
+        [status,state] =  self._render.renderEnv(self.objects)
+        if status:
+            self._state = state
     
     def step(self,action):
         self._actions.append(action)

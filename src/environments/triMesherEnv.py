@@ -122,21 +122,29 @@ class triMesherEnv(AbstractMeshEnv):
         westObj = lineOb(southWest,north)
         eastObj = lineOb(north,southEast)
 
+        westUsed = False
+        eastUsed = False
         if((valueNorth == 0.0) or (valueSouthWest == 0.0)):
-            self.startObjects.append(westObj)
-        else:
+            if(southWest[0] != 0 and north[0] != 0):
+                self.startObjects.append(westObj)
+                westUsed = True
+        if not westUsed:
             for pixel in BasicEnvironmentRender.computePixelsFromLine(southWest[0],southWest[1],north[0],north[1]):
                 if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
-                    self.startObjects.append(westObj)
-                    break
+                    if(pixel[0] != 0):
+                        self.startObjects.append(westObj)
+                        break
 
         if((valueNorth == 0.0) or (valueSouthEast == 0.0)):
-            self.startObjects.append(eastObj)
-        else:
+            if(southEast[0] != self._xRes+1 and north[0] != self._xRes+1):
+                self.startObjects.append(eastObj)
+                eastUsed = True
+        if not eastUsed:
             for pixel in BasicEnvironmentRender.computePixelsFromLine(north[0],north[1],southEast[0],southEast[1]):
                 if(self._state[pixel[0],pixel[1],channel] == 0.0 ):
-                    self.startObjects.append(eastObj)
-                    break
+                    if(pixel[0] != self._xRes+1):
+                        self.startObjects.append(eastObj)
+                        break
 
     def calculateFinishedObjectBonusReward(self):
         (northEastCornerX,northEastCornerY) = self.objects[-1].getNorthEast()

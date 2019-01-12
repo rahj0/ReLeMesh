@@ -60,23 +60,30 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         # print("southWest to northWest")
         
         #### Y 
-        for i in range(self._ySize):
-            newY = lastY + baseYLineLength
-            if i == self._ySize-1:
-                newY = maxY
-            else:
-                newY += self.generateRandomDeviation(-self._maxDeviationY,self._maxDeviationY)
+        if 0:
+            for i in range(self._ySize):
+                newY = lastY + baseYLineLength
+                if i == self._ySize-1:
+                    newY = maxY
+                else:
+                    newY += self.generateRandomDeviation(-self._maxDeviationY,self._maxDeviationY)
+                    
+                newX = minX + self.generateRandomDeviation(0,self._maxDeviationX)
                 
-            newX = minX + self.generateRandomDeviation(0,self._maxDeviationX)
-            
-            oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            # print(lastX,lastY," - " ,newX,newY)
-            lastY = newY
-            lastX = newX
-            self._objects.append(oldObject1)    
-  
-        northWestX = lastX
-        northWestY = lastY
+                oldObject1 = lineOb((lastX,lastY),(newX,newY))
+                # print(lastX,lastY," - " ,newX,newY)
+                lastY = newY
+                lastX = newX
+                self._objects.append(oldObject1)    
+    
+            northWestX = lastX
+            northWestY = lastY
+        else:
+            northWestX = minX
+            northWestY = maxY
+            lastX = northWestX
+            lastY = northWestY
+
 
         # print("northWest to northEast")
         for i in range(self._xSize):
@@ -99,18 +106,19 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         lastX = southEastX
         lastY = southEastY
 
+        if 0:
         # print("southEast to northEast")    
-        for i in range(self._ySize):
-            newY = lastY + baseYLineLength
-            newX = maxX - self.generateRandomDeviation(0,self._maxDeviationX)
-            if i == self._ySize-1:
-                newY = northEastY
-                newX = northEastX
-            else:
-                newY += self.generateRandomDeviation(-self._maxDeviationY,self._maxDeviationY)
-            
-            oldObject1 = lineOb((lastX,lastY),(newX,newY))
-            # print(lastX,lastY," - " ,newX,newY)
-            lastY = newY
-            lastX = newX
-            self._objects.append(oldObject1)    
+            for i in range(self._ySize):
+                newY = lastY + baseYLineLength
+                newX = maxX - self.generateRandomDeviation(0,self._maxDeviationX)
+                if i == self._ySize-1:
+                    newY = northEastY
+                    newX = northEastX
+                else:
+                    newY += self.generateRandomDeviation(-self._maxDeviationY,self._maxDeviationY)
+                
+                oldObject1 = lineOb((lastX,lastY),(newX,newY))
+                # print(lastX,lastY," - " ,newX,newY)
+                lastY = newY
+                lastX = newX
+                self._objects.append(oldObject1)    

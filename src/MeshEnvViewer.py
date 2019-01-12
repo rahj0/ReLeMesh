@@ -7,10 +7,12 @@ Created on Thu Jun 21 19:36:09 2018
 
 from tkinter import *
 import numpy as np
-
+from Networks.BasicQNetwork import *
 
 class meshEnvViewer():
-    def __init__(self, master, env, lineDistance = 10):
+    def __init__(self, master, env, lineDistance = 10, tfSession = None, qNetwork = None):
+        self._tfSession = tfSession
+        self._qNetwork = qNetwork
         self._gameOver = False
         self._env = env
         self._master = master
@@ -63,7 +65,13 @@ class meshEnvViewer():
         self._master.bind("0", lambda e:self.callback_key0())
         self._master.bind("1", lambda e:self.callback_key1())
         self._master.bind("2", lambda e:self.callback_key2())
-        self._master.bind("KP_3", lambda e:self.callback_key3())
+        self._master.bind("3", lambda e:self.callback_key3())
+        self._master.bind("4", lambda e:self.callback_key4())
+        self._master.bind("5", lambda e:self.callback_key5())
+        self._master.bind("6", lambda e:self.callback_key6())
+        self._master.bind("7", lambda e:self.callback_key7())
+        self._master.bind("8", lambda e:self.callback_key8())
+        self._master.bind("q", lambda e:self.useNetworkToMove())
 
         self.score_frame.pack()
         self.top_frame.pack()
@@ -124,6 +132,24 @@ class meshEnvViewer():
     def callback_key4(self):
         if not self._gameOver:
             self.doAction(4)
+    def callback_key5(self):
+        if not self._gameOver:
+            self.doAction(5)
+    def callback_key6(self):
+        if not self._gameOver:
+            self.doAction(6)
+    def callback_key7(self):
+        if not self._gameOver:
+            self.doAction(7)
+    def callback_key8(self):
+        if not self._gameOver:
+            self.doAction(8)
+    def useNetworkToMove(self):
+        if self._tfSession != None:
+            print(self._env.getSizeX())
+            s = processState(self._env.getState(), self._env.getSizeX()+2, self._env.getNumberOfChannels())
+            a = self._tfSession.run(self._qNetwork.predict,feed_dict={self._qNetwork.scalarInput:[s]})[0]
+            self.doAction(a)
 
     def paintState(self,state):
         self.clearCanvas()

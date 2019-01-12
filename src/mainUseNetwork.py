@@ -28,9 +28,9 @@ print(env.actions)
     
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
-h_size = 1024 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
+h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 num_episodes = 1
-max_epLength = 100
+max_epLength = 110
 
 tf.reset_default_graph()
 mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())

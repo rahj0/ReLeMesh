@@ -20,6 +20,11 @@ import time
 from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
+# For testing device location
+with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
+    a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
+    sess.run(a)
+
 sizeEnv = 16
 nChannels = 2
 env = triMesherEnv((sizeEnv-2), 0, 3, 3)
@@ -29,8 +34,8 @@ multi = 5
 batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
-startE = 0.9 #Starting chance of random action
-endE = 0.01 #Final chance of random action
+startE = 0.8 #Starting chance of random action
+endE = 0.001 #Final chance of random action
 
 num_episodes = 50000 #How many episodes of game environment to train network with.
 max_epLength = 110 #The max allowed length of our episode.
@@ -71,6 +76,8 @@ rList = []
 total_steps = 0
 
 #Make a path for our model to be saved in.
+
+
 if not os.path.exists(path):
     os.makedirs(path)
 last_avg = 0
@@ -81,7 +88,7 @@ envResetTime = 0.0
 envRenderTime = 0.0
 networkTime = 0.0
 startComplete = time.time()
-with tf.Session() as sess:
+with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
     sess.run(init)
     if load_model == True:
         print('Loading Model...')

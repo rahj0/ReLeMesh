@@ -220,9 +220,9 @@ class AbstractMeshEnv():
         
         newBonusValue = actualArea 
         newBonusValue -= pow(abs(actualArea-idealArea),1.5) 
-        print()
-        print("Area: ",actualArea)
-        print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
+        # print()
+        # print("Area: ",actualArea)
+        # print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
         newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
@@ -263,9 +263,9 @@ class AbstractMeshEnv():
             # self._state[1] = state[1]
 
     def refreshEnv(self):
-        [status,state] =  self._render.renderEnv(self.objects)
+        [status,state] =  self._render.renderEnvObject(self.objects[-1],np.zeros([self._yRes+2,self._xRes+2]))
         if status:
-            self._state = state
+            self._state[:,:,self.objects[-1].channel] = state
     
     def step(self,action):
         self._actions.append(action)

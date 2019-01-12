@@ -96,119 +96,126 @@ class BasicEnvironmentRender():
         pixels.append([x2,y2])
 
         return pixels
-
-    def renderEnv(self, objects):
+    def renderEnvObject(self, item, state):
         bufferX = 0
         bufferY = 0
-        a = np.zeros([self._yRes+2,self._xRes+2,2])
         maxIndexX = self._yRes+1
         maxIndexY = self._xRes+1
+        
+        item.intensity = 0.75
+        
+        (southWestCornerX,southWestCornerY) = (item.getSouthWest()[0] + bufferX,item.getSouthWest()[1] + bufferY)
+        (southEastCornerX,southEastCornerY) = (item.getSouthEast()[0] + bufferX,item.getSouthEast()[1] + bufferY)
+
+        (northWestCornerX,northWestCornerY) = item.getNorthWest()
+        (northEastCornerX,northEastCornerY) = item.getNorthEast()
+        
+        pixelsSouth = self.computePixelsFromLine(southEastCornerX,southEastCornerY,southWestCornerX,southWestCornerY)
+        pixelsWest = self.computePixelsFromLine(southWestCornerX,southWestCornerY,northWestCornerX,northWestCornerY)
+        pixelsNorth = self.computePixelsFromLine(northEastCornerX,northEastCornerY,northWestCornerX,northWestCornerY)
+        pixelsEast = self.computePixelsFromLine(southEastCornerX,southEastCornerY,northEastCornerX,northEastCornerY)
+        
+        if item.getName() == "hero":
+            wrongMove = False
+            if [northWestCornerX,northWestCornerY] in pixelsWest[:-1]:
+                wrongMove = True
+            if [northWestCornerX,northWestCornerY] in pixelsEast[:-1]:
+                wrongMove = True
+            if [northEastCornerX,northEastCornerY] in pixelsWest[:-1]:
+                wrongMove = True
+            if [northEastCornerX,northEastCornerY] in pixelsEast[:-1]:
+                wrongMove = True
+            if wrongMove:
+                return [False, 0]
+            
+        for pixel in pixelsWest:
+            state[pixel[0],pixel[1]] = item.intensity
+
+        for pixel in pixelsNorth:
+            state[pixel[0],pixel[1]] = item.intensity
+
+        for pixel in pixelsEast:
+            state[pixel[0],pixel[1]] = item.intensity
+                        
+        for pixel in pixelsSouth:
+            state[pixel[0],pixel[1]] = item.intensity
+
+        if item.channel == 1: 
+            state[pixelsWest[0][0],pixelsWest[0][1]] = 1
+            state[pixelsEast[0][0],pixelsEast[0][1]] = 1
+        
+        
+        state[pixelsWest[-1][0],pixelsWest[-1][1]] = 1
+        state[pixelsEast[-1][0],pixelsEast[-1][1]] = 1
+                    
+        # Inside square
+        (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
+        southEastCornerX,southEastCornerY)  
+        (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
+        northWestCornerX,northWestCornerY) 
+        if abs(xMove)+abs(yMove) > 0:
+            for i in range(len(pixelsWest))[1:-1]:
+                move = True
+                j = 0
+
+                while(move and j < 100):
+
+                    x = pixelsWest[i][0]+xMove*j
+                    y = pixelsWest[i][1]+yMove*j
+                    if x < 0 or y < 0 or y > maxIndexY or x > maxIndexY:
+                        move = False
+                        continue                        
+                    if [x,y] in pixelsNorth:
+                        move = False
+                        continue
+                    if [x,y] in pixelsSouth:
+                        move = False
+                        continue
+                    if [x,y] in pixelsEast:
+                        move = False
+                        continue
+
+                    if (state[x,y] == 0):
+                        state[x,y] = 0.5
+                    j +=1 
+                    
+        (xMove,yMove) = self.calculateXYmoveUnitVector(southEastCornerX,southEastCornerY,
+        northEastCornerX,northEastCornerY) 
+        #yMove *= -1
+        #xMove *= -1
+        if abs(xMove)+abs(yMove) > 0:
+            for i in range(len(pixelsEast))[1:-1]:
+                move = True
+                j = 0
+                
+                while(move and j < 100):
+                    x = pixelsEast[i][0]-xMove*j
+                    y = pixelsEast[i][1]-yMove*j
+                    if x < 0 or y < 0 or y > maxIndexY or x > maxIndexY:
+                        move = False
+                        continue    
+                    if [x,y] in pixelsNorth:
+                        move = False
+                        continue
+                    if [x,y] in pixelsSouth:
+                        move = False
+                        continue
+                    if [x,y] in pixelsWest:
+                        move = False
+                        continue
+                    if (state[x,y] == 0):
+                        state[x,y] = 0.5
+                    j +=1 
+        return [True, state]
+
+    def renderEnv(self, objects):
+        a = np.zeros([self._yRes+2,self._xRes+2,2])
 
         for item in objects:
             item.intensity = 0.75
-            
-            (southWestCornerX,southWestCornerY) = (item.getSouthWest()[0] + bufferX,item.getSouthWest()[1] + bufferY)
-            (southEastCornerX,southEastCornerY) = (item.getSouthEast()[0] + bufferX,item.getSouthEast()[1] + bufferY)
-
-            (northWestCornerX,northWestCornerY) = item.getNorthWest()
-            (northEastCornerX,northEastCornerY) = item.getNorthEast()
-            
-            pixelsSouth = self.computePixelsFromLine(southEastCornerX,southEastCornerY,southWestCornerX,southWestCornerY)
-            pixelsWest = self.computePixelsFromLine(southWestCornerX,southWestCornerY,northWestCornerX,northWestCornerY)
-            pixelsNorth = self.computePixelsFromLine(northEastCornerX,northEastCornerY,northWestCornerX,northWestCornerY)
-            pixelsEast = self.computePixelsFromLine(southEastCornerX,southEastCornerY,northEastCornerX,northEastCornerY)
-            
-            if item.getName() == "hero":
-                wrongMove = False
-                if [northWestCornerX,northWestCornerY] in pixelsWest[:-1]:
-                    wrongMove = True
-                if [northWestCornerX,northWestCornerY] in pixelsEast[:-1]:
-                    wrongMove = True
-                if [northEastCornerX,northEastCornerY] in pixelsWest[:-1]:
-                    wrongMove = True
-                if [northEastCornerX,northEastCornerY] in pixelsEast[:-1]:
-                    wrongMove = True
-                if wrongMove:
-                    return [False, 0]
-                
-            for pixel in pixelsWest:
-                a[pixel[0],pixel[1],item.channel] = item.intensity
-
-            for pixel in pixelsNorth:
-                a[pixel[0],pixel[1],item.channel] = item.intensity
-
-            for pixel in pixelsEast:
-                a[pixel[0],pixel[1],item.channel] = item.intensity
-                            
-            for pixel in pixelsSouth:
-                a[pixel[0],pixel[1],item.channel] = item.intensity
-
-            if item.channel == 1: 
-                a[pixelsWest[0][0],pixelsWest[0][1],item.channel] = 1
-                a[pixelsEast[0][0],pixelsEast[0][1],item.channel] = 1
-            
-            
-            a[pixelsWest[-1][0],pixelsWest[-1][1],item.channel] = 1
-            a[pixelsEast[-1][0],pixelsEast[-1][1],item.channel] = 1
-                        
-            # Inside square
-            (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
-            southEastCornerX,southEastCornerY)  
-            (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
-            northWestCornerX,northWestCornerY) 
-            if abs(xMove)+abs(yMove) > 0:
-                for i in range(len(pixelsWest))[1:-1]:
-                    move = True
-                    j = 0
-    
-                    while(move and j < 100):
-    
-                        x = pixelsWest[i][0]+xMove*j
-                        y = pixelsWest[i][1]+yMove*j
-                        if x < 0 or y < 0 or y > maxIndexY or x > maxIndexY:
-                            move = False
-                            continue                        
-                        if [x,y] in pixelsNorth:
-                            move = False
-                            continue
-                        if [x,y] in pixelsSouth:
-                            move = False
-                            continue
-                        if [x,y] in pixelsEast:
-                            move = False
-                            continue
-    
-                        if (a[x,y,item.channel] == 0):
-                            a[x,y,item.channel] = 0.5
-                        j +=1 
-                        
-            (xMove,yMove) = self.calculateXYmoveUnitVector(southEastCornerX,southEastCornerY,
-            northEastCornerX,northEastCornerY) 
-            #yMove *= -1
-            #xMove *= -1
-            if abs(xMove)+abs(yMove) > 0:
-                for i in range(len(pixelsEast))[1:-1]:
-                    move = True
-                    j = 0
-                    
-                    while(move and j < 100):
-                        x = pixelsEast[i][0]-xMove*j
-                        y = pixelsEast[i][1]-yMove*j
-                        if x < 0 or y < 0 or y > maxIndexY or x > maxIndexY:
-                            move = False
-                            continue    
-                        if [x,y] in pixelsNorth:
-                            move = False
-                            continue
-                        if [x,y] in pixelsSouth:
-                            move = False
-                            continue
-                        if [x,y] in pixelsWest:
-                            move = False
-                            continue
-                        if (a[x,y,item.channel] == 0):
-                            a[x,y,item.channel] = 0.5
-                        j +=1 
+            ok,a[:,:,item.channel] = self.renderEnvObject(item, a[:,:,item.channel])
+            if not ok:
+                return [False,a]
         b = a[:,:,0]
         c = a[:,:,1]
 

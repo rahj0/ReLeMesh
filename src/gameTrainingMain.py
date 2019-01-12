@@ -25,13 +25,14 @@ nChannels = 2
 env = triMesherEnv((sizeEnv-2), 0, 3, 3)
 print(env.actions)
     
-batch_size = 32 #How many experiences to use for each training step.
-update_freq = 4 #How often to perform a training step.
+multi = 5
+batch_size = 32*multi #How many experiences to use for each training step.
+update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
 startE = 0.9 #Starting chance of random action
 endE = 0.01 #Final chance of random action
 
-num_episodes = 80000 #How many episodes of game environment to train network with.
+num_episodes = 50000 #How many episodes of game environment to train network with.
 max_epLength = 110 #The max allowed length of our episode.
 
 annealing_steps_ratio = 0.8
@@ -42,7 +43,7 @@ print("Annealing steps: ", annealing_steps)
 load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
-tau = 0.001 #Rate to update target network toward primary   
+tau = 0.005 #Rate to update target network toward primary   
 bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.
 
@@ -76,8 +77,10 @@ last_avg = 0
 maxScore = 0
 last_max500 = 0
 bestActions = []
+envResetTime = 0.0
 envRenderTime = 0.0
 networkTime = 0.0
+startComplete = time.time()
 with tf.Session() as sess:
     sess.run(init)
     if load_model == True:
@@ -87,7 +90,9 @@ with tf.Session() as sess:
     for i in range(num_episodes):
         episodeBuffer = experience_buffer()
         #Reset environment and get first new observation
+        start = time.time()
         s = env.reset()
+        envResetTime += time.time() - start
         s = processState(s, sizeEnv, env.getNumberOfChannels())
         d = False
         rAll = 0
@@ -99,7 +104,9 @@ with tf.Session() as sess:
             if np.random.rand(1) < e or total_steps < pre_train_steps:
                 a = np.random.randint(0,env.actions)
             else:
+                start0 = time.time()
                 a = sess.run(mainQN.predict,feed_dict={mainQN.scalarInput:[s]})[0]
+                networkTime += time.time() - start0
             
             start = time.time()
             s1,r,d = env.step(a)
@@ -162,3 +169,8 @@ with tf.Session() as sess:
 print("Percent of succesful episodes: " + str(sum(rList)/num_episodes) + "%")
 print("Best Score: ", maxScore)
 print("Best Score Action list: ", bestActions)
+print("Total steps: ", total_steps)
+print("Env time: ", envRenderTime)
+print("Reset time: ", envResetTime)
+print("Network time: ", networkTime)
+print("Total time: ",  time.time()-startComplete)

@@ -7,6 +7,7 @@ Created on Tue May  8 22:33:20 2018
 
 from __future__ import division
 
+import argparse
 import numpy as np
 import random
 import tensorflow as tf
@@ -19,6 +20,16 @@ import time
 
 from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
+
+num_episodes = 0  #How many episodes of game environment to train network with.
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--episodes', dest='nEpisodes', default=5000,
+                    help='Number of episodes to run in training.')
+    args = parser.parse_args()
+    num_episodes = int(args.nEpisodes)
 
 # For testing device location
 with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
@@ -36,8 +47,6 @@ update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
 startE = 0.8 #Starting chance of random action
 endE = 0.001 #Final chance of random action
-
-num_episodes = 5000 #How many episodes of game environment to train network with.
 max_epLength = 110 #The max allowed length of our episode.
 
 annealing_steps_ratio = 0.8

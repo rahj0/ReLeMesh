@@ -22,7 +22,7 @@ from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
 num_episodes = 0  #How many episodes of game environment to train network with.
-
+inter_op_parallelism_threads = 36
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()

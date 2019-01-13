@@ -30,14 +30,14 @@ nChannels = 2
 env = triMesherEnv((sizeEnv-2), 0, 3, 3)
 print(env.actions)
     
-multi = 5
+multi = 1
 batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
 startE = 0.8 #Starting chance of random action
 endE = 0.001 #Final chance of random action
 
-num_episodes = 50000 #How many episodes of game environment to train network with.
+num_episodes = 5000 #How many episodes of game environment to train network with.
 max_epLength = 110 #The max allowed length of our episode.
 
 annealing_steps_ratio = 0.8
@@ -48,7 +48,7 @@ print("Annealing steps: ", annealing_steps)
 load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
-tau = 0.005 #Rate to update target network toward primary   
+tau = 0.001 #Rate to update target network toward primary   
 bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.
 

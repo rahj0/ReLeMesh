@@ -26,7 +26,7 @@ class AbstractMeshEnv():
     def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
-        self._overlappingPixelPenalty = 20
+        self._overlappingPixelPenalty = 8
         self._xRes = size
         self._yRes = size
         self._nChannels = 2

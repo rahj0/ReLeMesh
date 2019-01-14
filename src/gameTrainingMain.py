@@ -26,7 +26,7 @@ inter_op_parallelism_threads = 36
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--episodes', dest='nEpisodes', default=5000,
+    parser.add_argument('--episodes', dest='nEpisodes', default=30000,
                     help='Number of episodes to run in training.')
     args = parser.parse_args()
     num_episodes = int(args.nEpisodes)
@@ -46,11 +46,11 @@ batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
 startE = 0.8 #Starting chance of random action
-endE = 0.001 #Final chance of random action
+endE = 0.01 #Final chance of random action
 max_epLength = 110 #The max allowed length of our episode.
 
 annealing_steps_ratio = 0.8
-annealing_steps = int(num_episodes*max_epLength*annealing_steps_ratio)
+annealing_steps = 2400000
  #How many steps of training to reduce startE to endE.
 print("Annealing steps: ", annealing_steps)
 

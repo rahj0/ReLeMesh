@@ -211,9 +211,9 @@ class AbstractMeshEnv():
 
         if newHero:
             self._currentBonusValue = 0 
-            self.renderEnv()
-        else:
-            self.refreshEnv()
+        self.renderEnv()
+        # else:
+        #     self.refreshEnv()
 
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()

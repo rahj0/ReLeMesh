@@ -57,7 +57,7 @@ class triObj(gameOb):
         y2 = self._northEast[1]
         x3 = self._southEast[0]
         y3 = self._southEast[1]
-        return abs(0.5*(abs(x2-x1)*abs(y3-y1)-abs(x3-x1)*abs(y2-y1)))
+        return abs(0.5*((x2-x1)*(y3-y1)-(x3-x1)*(y2-y1)))
 
     def isNewShapeValid(self):
 #        return True

@@ -14,7 +14,7 @@ from environments.triMesherEnv import *
 tri = "y"
 if tri == "y":
     pass
-    env = triMesherEnv(size=14, seedValue=2, nLinesX = 3, nLinesY=3)
+    env = triMesherEnv(size=15, seedValue=2, nLinesX = 4, nLinesY=4)
 else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)

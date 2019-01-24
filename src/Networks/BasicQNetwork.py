@@ -24,13 +24,13 @@ class Qnetwork():
         self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*nChannels],dtype=tf.float32)
         self.imageIn = tf.reshape(self.scalarInput,shape=[-1,sizeEnv,sizeEnv,nChannels])
         self.conv1 = slim.conv2d( \
-            inputs=self.imageIn,num_outputs=64,kernel_size=[6,6],stride=[2,2],padding='VALID', biases_initializer=None)
+            inputs=self.imageIn,num_outputs=64,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv1.shape)    
         self.conv2 = slim.conv2d( \
-            inputs=self.conv1,num_outputs=128,kernel_size=[3,3],stride=[2,2],padding='VALID', biases_initializer=None)
+            inputs=self.conv1,num_outputs=128,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
         print(self.conv2.shape)  
         self.conv4 = slim.conv2d( \
-            inputs=self.conv2,num_outputs=h_size,kernel_size=[2,2],stride=[2,2],padding='VALID', biases_initializer=None)
+            inputs=self.conv2,num_outputs=h_size,kernel_size=[2,2],stride=[1,1],padding='VALID', biases_initializer=None)
         print(self.conv4.shape)   
         
         #We take the output from the final convolutional layer and split it into separate advantage and value streams.

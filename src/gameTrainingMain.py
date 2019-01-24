@@ -22,7 +22,7 @@ from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
 num_episodes = 0  #How many episodes of game environment to train network with.
-inter_op_parallelism_threads = 36
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
@@ -36,9 +36,9 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
     sess.run(a)
 
-sizeEnv = 16
+sizeEnv = 17
 nChannels = 2
-env = triMesherEnv((sizeEnv-2), 0, 3, 3)
+env = triMesherEnv((sizeEnv-2), 0, 4, 4)
 print(env.actions)
     
 multi = 1
@@ -47,11 +47,11 @@ update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
 startE = 0.8 #Starting chance of random action
 endE = 0.001 #Final chance of random action
-max_epLength = 100 #The max allowed length of our episode.
+max_epLength = 150 #The max allowed length of our episode.
 
-multi2 = 8
-annealing_steps = 400000*multi2 #How many steps of training to reduce startE to endE.
-num_episodes = 5000*multi2 #How many episodes of game environment to train network with.
+multi2 = 10
+annealing_steps = int(400000*multi2*0.5) #How many steps of training to reduce startE to endE.
+num_episodes = int(5000*multi2) #How many episodes of game environment to train network with.
 
  #How many steps of training to reduce startE to endE.
 print("Annealing steps: ", annealing_steps)
@@ -155,6 +155,8 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
 
                     networkTime += time.time() - start0
             rAll += r
+            # if rAll < -1.0:
+            #     d = True
             s = s1
             
             if d == True:

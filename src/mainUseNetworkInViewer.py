@@ -23,10 +23,10 @@ from environments.meshWorld import *
 from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
 
-sizeEnv = 16
+sizeEnv = 17
 # sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
-env = triMesherEnv((sizeEnv-2), 0, 3, 3)
+env = triMesherEnv((sizeEnv-2), 0, 4, 4)
 print(env.actions)
     
 load_model = True #Whether to load a saved model.

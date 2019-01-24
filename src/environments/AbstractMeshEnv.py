@@ -23,7 +23,7 @@ from environments.Rendering.BasicEnvironmentRender import *
 from worldGenerators.MeshWorldGenerator import *
 
 class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 50):
+    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 30):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         self._overlappingPixelPenalty = 8
@@ -194,7 +194,7 @@ class AbstractMeshEnv():
         heroBackup = self.objects[-1]
         done = False
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
-        reward = -2.0
+        reward = -0.5
         if newHero:
             self.saveHeroAsWall()
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):

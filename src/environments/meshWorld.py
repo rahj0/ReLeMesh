@@ -27,14 +27,13 @@ class meshEnv(AbstractMeshEnv):
     def __init__(self,size, seedValue = 0, nLinesX = 3, nLinesY = 3):
         self._nLinesX = nLinesX
         self._nLinesY = nLinesY
-        AbstractMeshEnv.__init__(self, False, 17, size, seedValue)
-
+        AbstractMeshEnv.__init__(self, False, size, 17)
 
     def resetConcreteClassSpecifics(self):
         self.objects = []
 
-        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 2, 2)
-        obj.generate(self._xRes+2,self._yRes+2)
+        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 0, 0)
+        obj.generate(self._xRes,self._yRes)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
         
@@ -46,8 +45,8 @@ class meshEnv(AbstractMeshEnv):
         return self._nLinesX * self._nLinesY * 2
 
     def getIdealObjectArea(self,x,y):
-        nObjects = 9 
-        return self._yRes * self._xRes / nObjects
+        nObjects = self._nLinesX*self._nLinesY
+        return (self._yRes+1) * (self._xRes+1) / nObjects
 
     def createNewHero(self):
 

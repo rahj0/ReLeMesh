@@ -99,8 +99,8 @@ class BasicEnvironmentRender():
     def renderEnvObject(self, item, state):
         bufferX = 0
         bufferY = 0
-        maxIndexX = self._yRes+1
-        maxIndexY = self._xRes+1
+        maxIndexX = self._yRes-1
+        maxIndexY = self._xRes-1
         
         item.intensity = 0.75
         
@@ -209,7 +209,7 @@ class BasicEnvironmentRender():
         return [True, state]
 
     def renderEnv(self, objects):
-        a = np.zeros([self._yRes+2,self._xRes+2,2])
+        a = np.zeros([self._yRes,self._xRes,2])
 
         for item in objects:
             item.intensity = 0.75

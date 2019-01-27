@@ -13,10 +13,10 @@ from environments.AbstractPartialViewEnv import *
 
 # tri = input('TriMesh (y/n):')
 pixelSize = 15
-tri = "p"
+tri = "y"
 if tri == "y":
     pass
-    env = triMesherEnv(size=15, seedValue=2, nLinesX = 4, nLinesY=4)
+    env = triMesherEnv(size=25, seedValue=2, nLinesX = 3, nLinesY=3)
 elif tri == "p":
     env = AbstractPartialViewEnv(triMesherEnv(size=31, seedValue=2, nLinesX = 8, nLinesY=8),15)
 else:

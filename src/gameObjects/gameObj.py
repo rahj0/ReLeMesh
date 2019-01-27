@@ -62,11 +62,17 @@ class gameOb():
     def getArea(self):
         x1 = self._southWest[0]
         y1 = self._southWest[1]
-        x2 = self._northEast[0]
-        y2 = self._northEast[1]
-        x3 = self._southEast[0]
-        y3 = self._southEast[1]
-        return 0.0
+        x2 = self._northWest[0]
+        y2 = self._northWest[1]
+
+        x3 = self._northEast[0]
+        y3 = self._northEast[1]
+        x4 = self._southEast[0]
+        y4 = self._southEast[1]
+
+        a123 = abs(0.5*((x2-x1)*(y3-y1)-(x3-x1)*(y2-y1)))
+        a341 = abs(0.5*((x4-x1)*(y3-y1)-(x3-x1)*(y4-y1)))
+        return a123+a341
 
     def getBonusValue(self):
         bonusValue = 0
@@ -153,6 +159,8 @@ class gameOb():
     def calculateArea(self):
         length = abs(self._southWest[0] - self._northEast[0])
         height = abs(self._southWest[1] - self._northEast[1])
+        print("length", length)
+        print("height", height)
         return length*height
     
     def skewnessPenalty(self):

@@ -37,7 +37,7 @@ class triMesherEnv(AbstractMeshEnv):
         self.objects = []
 
         obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 0, 0)
-        obj.generate(self._xRes+2,self._yRes+2)
+        obj.generate(self._xRes,self._yRes)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
         # shuffle(self.startObjects)

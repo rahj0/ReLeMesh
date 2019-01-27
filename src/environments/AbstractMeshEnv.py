@@ -128,26 +128,26 @@ class AbstractMeshEnv(ABC):
         outOfBound = False
         (northWestX,northWestY) = hero.getNorthWest()
         (northEastX,northEastY) = hero.getNorthEast()
-        if (northEastX >= self._xRes+2):
-            northEastX = self._xRes+1
+        if (northEastX >= self._xRes):
+            northEastX = self._xRes-1
             outOfBound = True
         elif (northEastX < 0):
             northEastX = 0
             outOfBound = True
-        if (northEastY >= self._yRes+2):
-            northEastY = self._yRes+1
+        if (northEastY >= self._yRes):
+            northEastY = self._yRes-1
             outOfBound = True
         elif (northEastY < 0):
             northEastY = 0            
             outOfBound = True
-        if (northWestX >= self._xRes+2):
-            northWestX = self._xRes+1
+        if (northWestX >= self._xRes):
+            northWestX = self._xRes-1
             outOfBound = True
         elif (northWestX < 0):
             northWestX = 0
             outOfBound = True
-        if (northWestY >= self._yRes+2):
-            northWestY = self._yRes+1
+        if (northWestY >= self._yRes):
+            northWestY = self._yRes-1
             outOfBound = True
         elif (northWestY < 0):
             northWestY = 0 
@@ -262,8 +262,9 @@ class AbstractMeshEnv(ABC):
         newBonusValue = actualArea 
         newBonusValue -= pow(abs(actualArea-idealArea),1.5) 
         # print()
-        # print("Area: ",actualArea)
-        # print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
+        print("Area: ",actualArea)
+        print("idealArea:", idealArea)
+        print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
         newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
@@ -304,7 +305,7 @@ class AbstractMeshEnv(ABC):
             # self._state[1] = state[1]
 
     def refreshEnv(self):
-        [status,state] =  self._render.renderEnvObject(self.objects[-1],np.zeros([self._yRes+2,self._xRes+2]))
+        [status,state] =  self._render.renderEnvObject(self.objects[-1],np.zeros([self._yRes,self._xRes]))
         if status:
             self._state[:,:,self.objects[-1].channel] = state
     

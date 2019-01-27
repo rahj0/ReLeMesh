@@ -16,8 +16,8 @@ class meshEnvViewer():
         self._gameOver = False
         self._env = env
         self._master = master
-        self._canvasWidth = self._env.getSizeX()+2
-        self._canvasHeight = self._env.getSizeY()+2
+        self._canvasWidth = self._env.getSizeX()
+        self._canvasHeight = self._env.getSizeY()
         self._lineDistance = lineDistance
         self._canvasPixelWidth=(self._canvasWidth+2)*self._lineDistance
         self._canvasPxelHeight=(self._canvasHeight+2)*self._lineDistance
@@ -156,8 +156,8 @@ class meshEnvViewer():
         self.createEmptyGrid()
 
         for colorBand in reversed(range(state.shape[2])):
-            for i in range(self._canvasWidth):
-                for j in range(self._canvasHeight):
+            for i in range(state.shape[0]):
+                for j in range(state.shape[1]):
                     if (state[i,j,colorBand] != 0):
                          self.paintPixel( i,j,colorBand,state[i,j,colorBand])
         

@@ -42,6 +42,11 @@ class triObj(gameOb):
         else:
             self._northWest = self._northEast
 
+    def getCenterPoint(self):
+        x = self._southWest[0] + self._southEast[0] + self._northEast[0]
+        y = self._southWest[1] + self._southEast[1] + self._northEast[1]
+        return (int(x/3),int(y/3))
+
     def setNorthWest(self, x, y):
         self._northWest = (x,y)
         self._northEast = (x,y)

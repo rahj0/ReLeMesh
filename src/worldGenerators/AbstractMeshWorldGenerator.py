@@ -5,11 +5,11 @@ Created on Tue Sep 11 22:39:57 2018
 @author: Rasmus
 """
 
-
+from abc import abstractmethod, ABC
 import random
 from gameObjects.lineObj import *
 
-class AbstractMeshWorldGenerator():
+class AbstractMeshWorldGenerator(ABC):
     def __init__(self, deviationProbability):
         if deviationProbability < 1:
             deviationProbability *= 100.0
@@ -28,14 +28,14 @@ class AbstractMeshWorldGenerator():
     
     def getStartObjects(self):
         return self._startObjects
-    
+    @abstractmethod
     def generate(self, worldSizeX, worldSizeY):
         raise
 
     def getIdealAverageSquareArea(self):
-        if _idealAverageObjectArea <= 0.0:
+        if self._idealAverageObjectArea <= 0.0:
             raise
-        return _idealAverageSquareArea
+        return self._idealAverageSquareArea
 
     def generateBorder(self,minX, minY, maxX, maxY, cornerMovement = [[0,0],[0,0],[0,0],[0,0]]):
                 

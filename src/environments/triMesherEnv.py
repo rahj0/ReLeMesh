@@ -30,9 +30,8 @@ class triMesherEnv(AbstractMeshEnv):
     def __init__(self,size, seedValue = 0, nLinesY = 3, nLinesX = 3):
         self._nLinesX = nLinesX
         self._nLinesY = nLinesY
-        AbstractMeshEnv.__init__(self, False, size, seedValue)
-        self.actions = 9
-
+        actions = 9
+        AbstractMeshEnv.__init__(self, False, size, actions, seedValue)
         
     def resetConcreteClassSpecifics(self):
         self.objects = []
@@ -41,7 +40,7 @@ class triMesherEnv(AbstractMeshEnv):
         obj.generate(self._xRes+2,self._yRes+2)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
-        shuffle(self.startObjects)
+        # shuffle(self.startObjects)
         hero = self.createNewHero()
         self.objects.append(hero)        
 

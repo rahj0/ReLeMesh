@@ -38,7 +38,7 @@ class SimpleSquareWithTriObjsEnv(AbstractMeshEnv):
         self._gameObjTipMovementLength = gameObjTipMovementLength
         self._gameObjTipDirection = gameObjTipDirection
         
-        AbstractMeshEnv.__init__(self, partial, size, seedValue)
+        AbstractMeshEnv.__init__(self, partial, 9, size, seedValue)
 
     def createNewHero(self):
 

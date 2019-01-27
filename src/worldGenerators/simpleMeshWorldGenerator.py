@@ -83,7 +83,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
             lastX = northWestX
             lastY = northWestY
 
-        if 0:
+        if 1:
             # print("northWest to northEast")
             for i in range(self._xSize):
                 newX = lastX + baseXLineLength
@@ -107,7 +107,7 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         lastX = southEastX
         lastY = southEastY
 
-        if 0:
+        if 1:
         # print("southEast to northEast")    
             for i in range(self._ySize):
                 newY = lastY + baseYLineLength

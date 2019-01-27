@@ -16,27 +16,31 @@ import numpy as np
 import random
 import itertools
 import scipy.misc
-from abc import abstractmethod
+import math
+from abc import abstractmethod, ABC
 from gameObjects.squareObj import *
 from gameObjects.triObj import *
 from environments.Rendering.BasicEnvironmentRender import *
-from worldGenerators.MeshWorldGenerator import *
+from worldGenerators.AbstractMeshWorldGenerator import *
 
-class AbstractMeshEnv():
-    def __init__(self,partial,size, seedValue = 0, cornerMatchBonus = 30):
+class AbstractMeshEnv(ABC):
+    def __init__(self,partial,size, actions, seedValue = 0, cornerMatchBonus = 30):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
+        self._useCenterOfFocus = False
+        self._centerOfFocus = (0,0)
         self._overlappingPixelPenalty = 8
         self._xRes = size
         self._yRes = size
         self._nChannels = 2
-        self.actions = 9
+        self._actions = actions
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
         self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
         self._render = BasicEnvironmentRender(self._xRes, self._yRes)
         self.reset()
+
     def getNumberOfChannels(self):
         return self._nChannels
     def getSizeX(self):
@@ -48,8 +52,16 @@ class AbstractMeshEnv():
     def setSeed(seedValue):
         self._seed = seedValue
 
+    def setCenterOfFocus(self,newCenterOfFocus):
+        self._useCenterOfFocus = True
+        print("New Focus", newCenterOfFocus)
+        self._centerOfFocus = newCenterOfFocus
+
     def getMaxNumberOfHeros(self):
         raise
+    def getHero(self):
+        return self.objects[-1]
+
     def printStats(self):
         print("Steps:" + str(self._totalSteps))
         print("Reward:" + str(self._totalReward))
@@ -79,14 +91,39 @@ class AbstractMeshEnv():
         self._currentBonusValue = actualArea- pow(abs(actualArea-self.getIdealObjectArea(0,0)),1.50)
         self._currentBonusValue /= self._normaliseValue
         return self._state
-        
+
     def getStartScore(self):
         return self._currentBonusValue
+
+    def pushToFrontStarterObjectNearestToPoint(self, coord):
+        x, y = coord
+        nObjs = len(self.startObjects)
+        if nObjs < 2:
+            return
+        nearestObj = 0
+        smallestDistance =  math.inf
+        # print("Dist")
+        print("Center used:", x, y)
+        for i in range(nObjs):
+            (xObj,yObj) = self.startObjects[i].getCenterPoint()
+            distance = math.sqrt((xObj-x)**2+(yObj-y)**2 )
+            # print((xObj,yObj))
+            if distance < smallestDistance:
+                nearestObj = i
+                smallestDistance = distance
+        print("Dist", self.startObjects[nearestObj].getCenterPoint())
+        self.startObjects.insert(0, self.startObjects.pop(nearestObj))
+
+
 
     @abstractmethod
     def resetConcreteClassSpecifics(self):
         raise
-    
+
+    @abstractmethod
+    def getIdealObjectArea(self,x,y):
+        raise
+
     def resizeObjToFitEnv(self,hero):
         outOfBound = False
         (northWestX,northWestY) = hero.getNorthWest()
@@ -141,10 +178,10 @@ class AbstractMeshEnv():
             self.convertHeroToStartObjects()
         return
 
-
+    @abstractmethod
     def createNewHero(self):
         raise
-    
+
     def checkStartObject():
         raise
         nextIsInvalid = True
@@ -159,7 +196,8 @@ class AbstractMeshEnv():
             reward += self._cornerMatchBonus
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
             reward += self._cornerMatchBonus
-        return reward            
+        return reward 
+
     def convertStepInput(self,direction):
         changeNorthWestX = 0
         changeNorthWestY = 0
@@ -197,6 +235,9 @@ class AbstractMeshEnv():
         reward = -0.5
         if newHero:
             self.saveHeroAsWall()
+            if self._useCenterOfFocus == True:
+                self.pushToFrontStarterObjectNearestToPoint(self._centerOfFocus) 
+
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
                 hero= self.createNewHero() 
                 self._nHeros += 1   
@@ -273,15 +314,4 @@ class AbstractMeshEnv():
         self._totalReward += reward
         self._totalSteps += 1
         return self.getState(),reward,done
-
-def test():
-    env = meshEnv(partial=False,size=12, seedValue=2)
-    
-def valueLeftUnitTester():
-#    print("0 == ",env.valueLeft(0,0,3,4))
-#    print("1 == ",env.valueLeft(1,0,3,4))
-#    print("1,2 == ",env.valueLeft(2,0,3,4))
-#    print("2 == ",env.valueLeft(3,0,3,4))
-#    print("3 == ",env.valueLeft(4,0,3,4))
-    pass
 

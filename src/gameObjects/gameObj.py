@@ -23,6 +23,10 @@ class gameOb():
         self._southEast = southEast
         self._northWest = northWest
         self._northEast = northEast
+    def getCenterPoint(self):
+        x = self._southWest[0] + self._southEast[0] + self._northWest[0] + self._northEast[0]
+        y = self._southWest[1] + self._southEast[1] + self._northWest[1] + self._northEast[1]
+        return (int(x/4),int(y/4))
         
     def calculateSouthWestCornerAngle(self):
         angle1 = self.calculateAngle(self._southWest,self._southEast)

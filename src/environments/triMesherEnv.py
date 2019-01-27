@@ -47,10 +47,6 @@ class triMesherEnv(AbstractMeshEnv):
     def getMaxNumberOfHeros(self):
         return self._nLinesX * self._nLinesY * 2
 
-    def getIdealObjectArea(self,x,y):
-        nObjects = self.getMaxNumberOfHeros()
-        return (self._yRes+1) * (self._xRes+1) / nObjects
-
     def cleanupStarterObjects(self, newObject):
         north = self.objects[-1].getNorthWest()
         southWest = self.objects[-1].getSouthWest()

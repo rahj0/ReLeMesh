@@ -59,6 +59,7 @@ class AbstractMeshEnv(ABC):
 
     def getMaxNumberOfHeros(self):
         raise
+
     def getHero(self):
         return self.objects[-1]
 
@@ -120,9 +121,10 @@ class AbstractMeshEnv(ABC):
     def resetConcreteClassSpecifics(self):
         raise
 
-    @abstractmethod
     def getIdealObjectArea(self,x,y):
-        raise
+        nObjects = self.getMaxNumberOfHeros()
+        print(self._xRes)
+        return (self._xRes-1) * (self._yRes-1)/ nObjects
 
     def resizeObjToFitEnv(self,hero):
         outOfBound = False

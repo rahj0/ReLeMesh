@@ -41,12 +41,9 @@ class meshEnv(AbstractMeshEnv):
         self.objects.append(hero)        
 #        
         self._state = self.renderEnv()  
+        
     def getMaxNumberOfHeros(self):
-        return self._nLinesX * self._nLinesY * 2
-
-    def getIdealObjectArea(self,x,y):
-        nObjects = self._nLinesX*self._nLinesY
-        return (self._yRes+1) * (self._xRes+1) / nObjects
+        return self._nLinesX * self._nLinesY
 
     def createNewHero(self):
 

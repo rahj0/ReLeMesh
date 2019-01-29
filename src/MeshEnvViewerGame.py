@@ -16,9 +16,9 @@ pixelSize = 15
 tri = "p"
 if tri == "y":
     pass
-    env = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
+    env = triMesherEnv(size=17, seedValue=4, nLinesX = 4, nLinesY=4)
 elif tri == "p":
-    env = AbstractPartialViewEnv(triMesherEnv(size=29, seedValue=2, nLinesX = 7, nLinesY=7),15)
+    env = AbstractPartialViewEnv(triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5),15)
 else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)

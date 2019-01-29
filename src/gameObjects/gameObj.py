@@ -27,6 +27,11 @@ class gameOb():
         x = self._southWest[0] + self._southEast[0] + self._northWest[0] + self._northEast[0]
         y = self._southWest[1] + self._southEast[1] + self._northWest[1] + self._northEast[1]
         return (int(x/4),int(y/4))
+
+    def getMovingCenterPoint(self):
+        x = self._northWest[0] + self._northEast[0]
+        y = self._northWest[1] + self._northEast[1]
+        return (int(x/2),int(y/2))
         
     def calculateSouthWestCornerAngle(self):
         angle1 = self.calculateAngle(self._southWest,self._southEast)
@@ -159,8 +164,6 @@ class gameOb():
     def calculateArea(self):
         length = abs(self._southWest[0] - self._northEast[0])
         height = abs(self._southWest[1] - self._northEast[1])
-        print("length", length)
-        print("height", height)
         return length*height
     
     def skewnessPenalty(self):

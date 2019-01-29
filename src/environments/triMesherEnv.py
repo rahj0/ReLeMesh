@@ -40,7 +40,7 @@ class triMesherEnv(AbstractMeshEnv):
         obj.generate(self._xRes,self._yRes)
         self.objects.extend(obj.getObjects())
         self.startObjects.extend(obj.getStartObjects())
-        # shuffle(self.startObjects)
+        shuffle(self.startObjects)
         hero = self.createNewHero()
         self.objects.append(hero)        
 

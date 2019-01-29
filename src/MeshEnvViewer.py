@@ -10,7 +10,8 @@ import numpy as np
 from Networks.BasicQNetwork import *
 
 class meshEnvViewer():
-    def __init__(self, master, env, lineDistance = 10, tfSession = None, qNetwork = None):
+    def __init__(self, master, env, lineDistance = 10, tfSession = None, qNetwork = None, resetOnStart = False):
+        self._actionCount = 0
         self._tfSession = tfSession
         self._qNetwork = qNetwork
         self._gameOver = False
@@ -32,7 +33,8 @@ class meshEnvViewer():
         self._canvas.grid(row=1,column=1)
         self.createEmptyGrid()
         self._score = 0
-        env.reset()
+        if resetOnStart:
+            env.reset()
         self.paintState(env.getState())
         
         
@@ -72,21 +74,25 @@ class meshEnvViewer():
         self._master.bind("7", lambda e:self.callback_key7())
         self._master.bind("8", lambda e:self.callback_key8())
         self._master.bind("q", lambda e:self.useNetworkToMove())
+        self._master.bind("z", lambda e:self.zoomToogle())
 
         self.score_frame.pack()
         self.top_frame.pack()
 #        self.bottom_frame.pack()
         self.info_frame.pack()
         
+    def zoomToogle(self):
+        pass
 
     def doAction(self, action):
+        self._actionCount += 1
         indexAdd = 0
         if (self._cornerVariable.get() ==  "RightCorner"):
             indexAdd = 4
         if action == 8:
             indexAdd = 0
         (state,reward,done) = self._env.step(action+indexAdd)
-        print(reward)
+        print(self._actionCount,reward)
         self._score += reward
         self.clearCanvas()
         self.paintState(state)
@@ -147,7 +153,7 @@ class meshEnvViewer():
     def useNetworkToMove(self):
         if self._tfSession != None:
             print(self._env.getSizeX())
-            s = processState(self._env.getState(), self._env.getSizeX()+2, self._env.getNumberOfChannels())
+            s = processState(self._env.getState(), self._env.getSizeX(), self._env.getNumberOfChannels())
             a = self._tfSession.run(self._qNetwork.predict,feed_dict={self._qNetwork.scalarInput:[s]})[0]
             self.doAction(a)
 

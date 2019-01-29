@@ -19,6 +19,7 @@ import time
 "matplotlib inline"
 
 from environments.triMesherEnv import triMesherEnv
+from environments.AbstractPartialViewEnv import AbstractPartialViewEnv
 from Networks.BasicQNetwork import *
 
 num_episodes = 0  #How many episodes of game environment to train network with.
@@ -36,27 +37,28 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
     sess.run(a)
 
-sizeEnv = 17
+sizeEnv = 15
 nChannels = 2
-env = triMesherEnv((sizeEnv-2), 0, 4, 4)
-print(env.actions)
+env = triMesherEnv((sizeEnv), 0, 4, 4)
+fullEnv = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
+env = AbstractPartialViewEnv(fullEnv,sizeEnv)
     
 multi = 1
 batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
-startE = 0.8 #Starting chance of random action
+startE = 0.5 #Starting chance of random action
 endE = 0.001 #Final chance of random action
-max_epLength = 150 #The max allowed length of our episode.
+max_epLength = 175 #The max allowed length of our episode.
 
 multi2 = 10
-annealing_steps = int(400000*multi2*0.5) #How many steps of training to reduce startE to endE.
+annealing_steps = int(400000*multi2*0.6) #How many steps of training to reduce startE to endE.
 num_episodes = int(5000*multi2) #How many episodes of game environment to train network with.
 
  #How many steps of training to reduce startE to endE.
 print("Annealing steps: ", annealing_steps)
 
-load_model = False #Whether to load a saved model.
+load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 tau = 0.001 #Rate to update target network toward primary   
@@ -64,8 +66,8 @@ bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.
 
 tf.reset_default_graph()
-mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
-targetQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
+mainQN = Qnetwork(h_size,env.getActionCount(),sizeEnv,env.getNumberOfChannels())
+targetQN = Qnetwork(h_size,env.getActionCount(),sizeEnv,env.getNumberOfChannels())
 
 init = tf.global_variables_initializer()
 
@@ -120,7 +122,7 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
             j+=1
             #Choose an action by greedily (with e chance of random action) from the Q-network
             if np.random.rand(1) < e or total_steps < pre_train_steps:
-                a = np.random.randint(0,env.actions)
+                a = np.random.randint(0,env.getActionCount())
             else:
                 start0 = time.time()
                 a = sess.run(mainQN.predict,feed_dict={mainQN.scalarInput:[s]})[0]
@@ -164,7 +166,7 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
         if rAll > maxScore:
             env.printStats()
             maxScore = rAll
-            bestActions = env.getActions()
+            bestActions = env.getActionCount()
         myBuffer.add(episodeBuffer.buffer)
         jList.append(j)
         rList.append(rAll)

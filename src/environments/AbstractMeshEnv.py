@@ -33,12 +33,15 @@ class AbstractMeshEnv(ABC):
         self._xRes = size
         self._yRes = size
         self._nChannels = 2
-        self._actions = actions
+        self._actionCount = actions
         self.partial = partial
         self._seed = seedValue
         self._cornerMatchBonus = cornerMatchBonus
         self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
         self._render = BasicEnvironmentRender(self._xRes, self._yRes)
+        self._totalSteps = 0
+        self._totalReward = 0
+        self._actions = []
         self.reset()
 
     def getNumberOfChannels(self):
@@ -54,7 +57,6 @@ class AbstractMeshEnv(ABC):
 
     def setCenterOfFocus(self,newCenterOfFocus):
         self._useCenterOfFocus = True
-        print("New Focus", newCenterOfFocus)
         self._centerOfFocus = newCenterOfFocus
 
     def getMaxNumberOfHeros(self):
@@ -68,8 +70,8 @@ class AbstractMeshEnv(ABC):
         print("Reward:" + str(self._totalReward))
         print("Actions:" + str(self._actions))
 
-    def getActions(self):
-        return self._actions
+    def getActionCount(self):
+        return self._actionCount
 
     def reset(self):
         self._actions = []
@@ -103,16 +105,12 @@ class AbstractMeshEnv(ABC):
             return
         nearestObj = 0
         smallestDistance =  math.inf
-        # print("Dist")
-        print("Center used:", x, y)
         for i in range(nObjs):
             (xObj,yObj) = self.startObjects[i].getCenterPoint()
             distance = math.sqrt((xObj-x)**2+(yObj-y)**2 )
-            # print((xObj,yObj))
             if distance < smallestDistance:
                 nearestObj = i
                 smallestDistance = distance
-        print("Dist", self.startObjects[nearestObj].getCenterPoint())
         self.startObjects.insert(0, self.startObjects.pop(nearestObj))
 
 
@@ -123,7 +121,6 @@ class AbstractMeshEnv(ABC):
 
     def getIdealObjectArea(self,x,y):
         nObjects = self.getMaxNumberOfHeros()
-        print(self._xRes)
         return (self._xRes-1) * (self._yRes-1)/ nObjects
 
     def resizeObjToFitEnv(self,hero):
@@ -263,10 +260,9 @@ class AbstractMeshEnv(ABC):
         
         newBonusValue = actualArea 
         newBonusValue -= pow(abs(actualArea-idealArea),1.5) 
-        # print()
-        print("Area: ",actualArea)
-        print("idealArea:", idealArea)
-        print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
+        # print("Area: ",actualArea)
+        # print("idealArea:", idealArea)
+        # print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
         newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue

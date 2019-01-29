@@ -3,12 +3,18 @@ from environments.AbstractMeshEnv import *
 class AbstractPartialViewEnv(AbstractMeshEnv): 
     def __init__(self, environment, viewSize=15 , seedValue = 0, cornerMatchBonus = 30):
         self._fullEnv = environment
-        AbstractMeshEnv.__init__(self, False, viewSize, environment.getActions(), seedValue, cornerMatchBonus)
-        self._centerOfFocus = (4,0)
+        AbstractMeshEnv.__init__(self, False, viewSize, environment.getActionCount(), seedValue, cornerMatchBonus)
+        x,y = self._fullEnv.getHero().getCenterPoint()
+        self._centerOfFocus = (x,y)
         self._fullEnv.setCenterOfFocus(self._centerOfFocus)
-
+    def getFullEnvState(self):
+        return self._fullEnv.getState()
+        
     def reset(self):
         state = self._fullEnv.reset()
+        x,y = self._fullEnv.getHero().getCenterPoint() # TODO Cleanup duplicate
+        self._centerOfFocus = (x,y)
+        self._fullEnv.setCenterOfFocus(self._centerOfFocus)
         return self.cutState(state)
 
     def resetConcreteClassSpecifics(self):
@@ -50,9 +56,12 @@ class AbstractPartialViewEnv(AbstractMeshEnv):
     def cutState(self, state):
         xMax = self._fullEnv.getSizeX()
         yMax = self._fullEnv.getSizeY()
-        xC,yC = self._centerOfFocus
+        xC,yC  = self._fullEnv.getHero().getMovingCenterPoint()
+        # print("Center of focus", xC,yC)
         (xWest,xEast) = self.calculateRangeFromCenterPoint(xC,self.getSizeX(),xMax)
         (ySouth,yNorth) = self.calculateRangeFromCenterPoint(yC,self.getSizeY(),yMax)
+        # print(xWest,xEast)
+        # print(ySouth,yNorth)
         return state[xWest:xEast,ySouth:yNorth,:]
 
     def step(self,action):
@@ -64,6 +73,8 @@ class AbstractPartialViewEnv(AbstractMeshEnv):
             self._fullEnv.setCenterOfFocus(self._centerOfFocus)
             self.updateCenterOfFocus(x,y)
         newState = self.cutState(state)
+        self._totalReward += reward
+        self._totalSteps += 1
         return (newState,reward,done) 
 
     def createNewHero(self):

@@ -22,13 +22,14 @@ from gameObjects.squareObj import *
 from gameObjects.triObj import *
 from environments.Rendering.BasicEnvironmentRender import *
 from worldGenerators.AbstractMeshWorldGenerator import *
+from worldGenerators.simpleMeshWorldGenerator import *
+from random import shuffle
 
 class AbstractMeshEnv(ABC):
     def __init__(self,partial,size, actions, seedValue = 0, cornerMatchBonus = 30):
         if size < 4:
             raise ValueError('Size of Environment is too small.')
         self._useCenterOfFocus = False
-        self._centerOfFocus = (0,0)
         self._overlappingPixelPenalty = 8
         self._xRes = size
         self._yRes = size
@@ -39,9 +40,7 @@ class AbstractMeshEnv(ABC):
         self._cornerMatchBonus = cornerMatchBonus
         self._normaliseValue = (self._cornerMatchBonus+self.getIdealObjectArea(0,0) )
         self._render = BasicEnvironmentRender(self._xRes, self._yRes)
-        self._totalSteps = 0
-        self._totalReward = 0
-        self._actions = []
+        self._worldGenerator = simpleMeshWorldGenerator(2, 2, 0, 0)
         self.reset()
 
     def getNumberOfChannels(self):
@@ -59,9 +58,13 @@ class AbstractMeshEnv(ABC):
         self._useCenterOfFocus = True
         self._centerOfFocus = newCenterOfFocus
 
+    def setWorldGenerator(self, newAbstractMeshWorldGenerator):
+        self._worldGenerator = newAbstractMeshWorldGenerator
+
+    @abstractmethod
     def getMaxNumberOfHeros(self):
         raise
-
+    
     def getHero(self):
         return self.objects[-1]
 
@@ -73,11 +76,12 @@ class AbstractMeshEnv(ABC):
     def getActionCount(self):
         return self._actionCount
 
-    def reset(self):
-        self._actions = []
+    def resetVariables(self):
+        self._centerOfFocus = (0,0)
         self._totalSteps = 0
         self._totalReward = 0
-        self._nHeros = 1
+        self._actions = []
+        self._nHeros = 0
         self.objects = []
         self.startObjects = []
         self._score = 0
@@ -85,7 +89,14 @@ class AbstractMeshEnv(ABC):
         self._currentBonusValue = 0.0
         self._done = False
 
-        self.resetConcreteClassSpecifics()
+    def reset(self):
+        self.resetVariables()
+        self._worldGenerator.generate(self._xRes,self._yRes)
+        self.objects.extend(self._worldGenerator.getObjects())
+        self.startObjects.extend(self._worldGenerator.getStartObjects())
+        shuffle(self.startObjects)
+        hero = self.createNewHero()
+        self.objects.append(hero) 
         for gameObject in self.objects:
             self.resizeObjToFitEnv(gameObject)
         self.renderEnv()  
@@ -112,13 +123,7 @@ class AbstractMeshEnv(ABC):
                 nearestObj = i
                 smallestDistance = distance
         self.startObjects.insert(0, self.startObjects.pop(nearestObj))
-
-
-
-    @abstractmethod
-    def resetConcreteClassSpecifics(self):
-        raise
-
+        
     def getIdealObjectArea(self,x,y):
         nObjects = self.getMaxNumberOfHeros()
         return (self._xRes-1) * (self._yRes-1)/ nObjects
@@ -180,12 +185,6 @@ class AbstractMeshEnv(ABC):
     @abstractmethod
     def createNewHero(self):
         raise
-
-    def checkStartObject():
-        raise
-        nextIsInvalid = True
-        while(nextIsInvalid):
-            nextObj = self.startObjects[0]
   
     def calculateFinishedObjectBonusReward(self):
         (northWestCornerX,northWestCornerY) = self.objects[-1].getNorthWest()
@@ -240,7 +239,6 @@ class AbstractMeshEnv(ABC):
             if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
                 hero= self.createNewHero() 
                 self._nHeros += 1   
-                
             else:
                 done = True
         else:
@@ -253,7 +251,7 @@ class AbstractMeshEnv(ABC):
             self._currentBonusValue = 0 
         self.renderEnv()
         # else:
-        #     self.refreshEnv()
+        #     self.refreshEnv() TODO Fix 
 
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
@@ -267,12 +265,9 @@ class AbstractMeshEnv(ABC):
         newBonusValue += self.calculateFinishedObjectBonusReward()
         reward += newBonusValue- self._currentBonusValue* self._normaliseValue
         self._currentBonusValue = newBonusValue / self._normaliseValue
-        # reward = min(2.0, reward / self._normaliseValue)
+
         reward =  reward / self._normaliseValue
         self.objects[-1] = hero
-        # print(reward, self.countFilledPixels() , newBonusValue, pow(abs(actualArea-idealArea),1.50), direction, self._nHeros)
-        # if newHero:
-        #     reward = 0    
         return reward,done
         
     def countFilledPixels(self):

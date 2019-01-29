@@ -19,9 +19,7 @@ import itertools
 import scipy.misc
 from abc import abstractmethod
 from gameObjects.triObj import *
-from worldGenerators.simpleMeshWorldGenerator import *
 from environments.AbstractMeshEnv import *
-from random import shuffle
 
 class triMesherEnv(AbstractMeshEnv):
     ''' Create Mesh Environment using triangles.
@@ -32,17 +30,7 @@ class triMesherEnv(AbstractMeshEnv):
         self._nLinesY = nLinesY
         actions = 9
         AbstractMeshEnv.__init__(self, False, size, actions, seedValue)
-        
-    def resetConcreteClassSpecifics(self):
-        self.objects = []
-
-        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 0, 0)
-        obj.generate(self._xRes,self._yRes)
-        self.objects.extend(obj.getObjects())
-        self.startObjects.extend(obj.getStartObjects())
-        shuffle(self.startObjects)
-        hero = self.createNewHero()
-        self.objects.append(hero)        
+        self.setWorldGenerator(simpleMeshWorldGenerator(nLinesX,nLinesY, 0, 0))
 
     def getMaxNumberOfHeros(self):
         return self._nLinesX * self._nLinesY * 2

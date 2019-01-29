@@ -11,6 +11,7 @@ class AbstractPartialViewEnv(AbstractMeshEnv):
         return self._fullEnv.getState()
         
     def reset(self):
+        self.resetVariables()
         state = self._fullEnv.reset()
         x,y = self._fullEnv.getHero().getCenterPoint() # TODO Cleanup duplicate
         self._centerOfFocus = (x,y)
@@ -63,6 +64,9 @@ class AbstractPartialViewEnv(AbstractMeshEnv):
         # print(xWest,xEast)
         # print(ySouth,yNorth)
         return state[xWest:xEast,ySouth:yNorth,:]
+
+    def getMaxNumberOfHeros(self):
+        pass
 
     def step(self,action):
         (_,_,_,_,newHero) = self._fullEnv.convertStepInput(action)

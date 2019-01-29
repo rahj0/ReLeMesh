@@ -19,8 +19,6 @@ import scipy.misc
 from abc import abstractmethod
 from gameObjects.squareObj import *
 from gameObjects.quadObj import *
-
-from worldGenerators.simpleMeshWorldGenerator import *
 from environments.AbstractMeshEnv import *
 
 class meshEnv(AbstractMeshEnv):
@@ -29,19 +27,6 @@ class meshEnv(AbstractMeshEnv):
         self._nLinesY = nLinesY
         AbstractMeshEnv.__init__(self, False, size, 17)
 
-    def resetConcreteClassSpecifics(self):
-        self.objects = []
-
-        obj = simpleMeshWorldGenerator(self._nLinesX , self._nLinesY, 0, 0)
-        obj.generate(self._xRes,self._yRes)
-        self.objects.extend(obj.getObjects())
-        self.startObjects.extend(obj.getStartObjects())
-        
-        hero = self.createNewHero()
-        self.objects.append(hero)        
-#        
-        self._state = self.renderEnv()  
-        
     def getMaxNumberOfHeros(self):
         return self._nLinesX * self._nLinesY
 

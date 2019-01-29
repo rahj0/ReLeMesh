@@ -28,6 +28,7 @@ class AbstractMeshWorldGenerator(ABC):
     
     def getStartObjects(self):
         return self._startObjects
+        
     @abstractmethod
     def generate(self, worldSizeX, worldSizeY):
         raise

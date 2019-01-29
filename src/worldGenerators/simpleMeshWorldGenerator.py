@@ -21,7 +21,8 @@ class simpleMeshWorldGenerator(AbstractMeshWorldGenerator):
         minY = 0
         maxX = worldSizeX - 1
         maxY = worldSizeY - 1
-        
+        self._objects = []
+        self._startObjects = [] 
         # TODO: Add checks that worldSizeX is bigger than _maxDeviations for x and y
         
         baseXLineLength = int(worldSizeX/self._xSize)

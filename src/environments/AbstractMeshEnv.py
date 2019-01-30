@@ -60,6 +60,7 @@ class AbstractMeshEnv(ABC):
 
     def setWorldGenerator(self, newAbstractMeshWorldGenerator):
         self._worldGenerator = newAbstractMeshWorldGenerator
+        self.reset()
 
     @abstractmethod
     def getMaxNumberOfHeros(self):
@@ -96,6 +97,7 @@ class AbstractMeshEnv(ABC):
         self.startObjects.extend(self._worldGenerator.getStartObjects())
         shuffle(self.startObjects)
         hero = self.createNewHero()
+        self._nHeros += 1
         self.objects.append(hero) 
         for gameObject in self.objects:
             self.resizeObjToFitEnv(gameObject)

@@ -23,18 +23,19 @@ from environments.meshWorld import *
 from environments.triMesherEnv import triMesherEnv
 from environments.AbstractPartialViewEnv import AbstractPartialViewEnv
 from Networks.BasicQNetwork import *
+from worldGenerators.ObjectInTheMiddleWorldGenerator import *
 
 sizeEnv = 15
 # sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
-env = triMesherEnv(sizeEnv, 0, 4, 4)
 fullEnv = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
+fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(5,5,0,0))
 env = AbstractPartialViewEnv(fullEnv,sizeEnv)
  
 
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
-h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
+h_size = 750 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 num_episodes = 1
 max_epLength = 110
 

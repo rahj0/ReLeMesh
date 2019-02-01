@@ -19,6 +19,7 @@ import time
 "matplotlib inline"
 
 from environments.triMesherEnv import triMesherEnv
+from worldGenerators.ObjectInTheMiddleWorldGenerator import *
 from environments.AbstractPartialViewEnv import AbstractPartialViewEnv
 from Networks.BasicQNetwork import *
 
@@ -38,21 +39,23 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     sess.run(a)
 
 sizeEnv = 15
+# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
 nChannels = 2
-env = triMesherEnv((sizeEnv), 0, 4, 4)
 fullEnv = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
+fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(5,5,0,0))
 env = AbstractPartialViewEnv(fullEnv,sizeEnv)
-    
+
 multi = 1
 batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
-startE = 0.5 #Starting chance of random action
+startE = 0.8 #Starting chance of random action
 endE = 0.001 #Final chance of random action
-max_epLength = 175 #The max allowed length of our episode.
+max_epLength = 180 #The max allowed length of our episode.
 
-multi2 = 10
-annealing_steps = int(400000*multi2*0.6) #How many steps of training to reduce startE to endE.
+
+multi2 = 15
+annealing_steps = int(400000*multi2*0.9) #How many steps of training to reduce startE to endE.
 num_episodes = int(5000*multi2) #How many episodes of game environment to train network with.
 
  #How many steps of training to reduce startE to endE.
@@ -60,7 +63,7 @@ print("Annealing steps: ", annealing_steps)
 
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
-h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
+h_size = 750 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 tau = 0.001 #Rate to update target network toward primary   
 bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.

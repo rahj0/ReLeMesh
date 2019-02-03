@@ -25,13 +25,11 @@ from environments.AbstractPartialViewEnv import AbstractPartialViewEnv
 from Networks.BasicQNetwork import *
 from worldGenerators.ObjectInTheMiddleWorldGenerator import *
 
-sizeEnv = 15
-# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
+sizeEnv = 15; xLines = 5; yLines = 5
 nChannels = 2
-fullEnv = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
-fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(5,5,0,0))
+fullEnv = triMesherEnv(size=31, seedValue=2, nLinesX = xLines, nLinesY=yLines)
+fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(xLines,yLines,0,0))
 env = AbstractPartialViewEnv(fullEnv,sizeEnv)
- 
 
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.

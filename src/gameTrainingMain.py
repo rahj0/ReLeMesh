@@ -38,11 +38,10 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
     sess.run(a)
 
-sizeEnv = 15
-# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
+sizeEnv = 15, xLines = 5, yLines = 5
 nChannels = 2
-fullEnv = triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5)
-fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(5,5,0,0))
+fullEnv = triMesherEnv(size=31, seedValue=2, nLinesX = xLines, nLinesY=yLines)
+fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(xLines,yLines,0,0))
 env = AbstractPartialViewEnv(fullEnv,sizeEnv)
 
 multi = 1

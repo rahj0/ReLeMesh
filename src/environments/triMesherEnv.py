@@ -134,6 +134,8 @@ class triMesherEnv(AbstractMeshEnv):
         reward = 0.0
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
             reward += self._cornerMatchBonus
+        elif self._state[northEastCornerX,northEastCornerY,1] > 0.0:
+            reward -= self._cornerMatchBonus
         return reward   
 
     def createNewHero(self):

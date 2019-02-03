@@ -194,8 +194,12 @@ class AbstractMeshEnv(ABC):
         reward = 0.0
         if self._state[northWestCornerX,northWestCornerY,1] == 1.0:
             reward += self._cornerMatchBonus
+        elif self._state[northWestCornerX,northWestCornerY,1] > 0.0:
+            reward -= self._cornerMatchBonus
         if self._state[northEastCornerX,northEastCornerY,1] == 1.0:
             reward += self._cornerMatchBonus
+        elif self._state[northEastCornerX,northEastCornerY,1] > 0.0:
+            reward -= self._cornerMatchBonus
         return reward 
 
     def convertStepInput(self,direction):
@@ -291,6 +295,7 @@ class AbstractMeshEnv(ABC):
                     if value < 0.51: # TODO: Remove hardcoded value
                         if self._state[i,j,1] > 0.0:
                             count += 1
+        print(count)
         return count
     def renderEnv(self):
         [status,state] =  self._render.renderEnv(self.objects)

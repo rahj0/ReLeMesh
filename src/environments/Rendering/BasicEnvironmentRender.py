@@ -151,6 +151,31 @@ class BasicEnvironmentRender():
         # Inside square
         (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
         southEastCornerX,southEastCornerY)  
+        if abs(xMove)+abs(yMove) > 0:
+            for i in range(len(pixelsSouth))[1:-1]:
+                move = True
+                j = 0
+
+                while(move and j < 100):
+
+                    x = pixelsSouth[i][0]-xMove*j
+                    y = pixelsSouth[i][1]-yMove*j
+                    if x < 0 or y < 0 or y > maxIndexY or x > maxIndexY:
+                        move = False
+                        continue                        
+                    if [x,y] in pixelsNorth:
+                        move = False
+                        continue
+                    if [x,y] in pixelsEast:
+                        move = False
+                        continue
+                    if [x,y] in pixelsWest:
+                        move = False
+                        continue
+                    if (state[x,y] == 0):
+                        state[x,y] = 0.5
+                    j +=1 
+
         (xMove,yMove) = self.calculateXYmoveUnitVector(southWestCornerX,southWestCornerY,
         northWestCornerX,northWestCornerY) 
         if abs(xMove)+abs(yMove) > 0:

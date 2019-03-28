@@ -9,16 +9,17 @@ from tkinter import *
 from MeshEnvViewer import *
 from environments.meshWorld import *
 from environments.triMesherEnv import *
-from environments.AbstractPartialViewEnv import * 
+from environments.PartialViewEnv import * 
 
-# tri = input('TriMesh (y/n):')
+print("Select Environment: \np: Partial View Environment")
+print("t: Triangle Objects Environment\nq: Quad Objects Environment")
+userInput = input('Enter choice:')
 pixelSize = 15
-tri = "p"
-if tri == "y":
+if userInput == "t":
     pass
     env = triMesherEnv(size=17, seedValue=4, nLinesX = 4, nLinesY=4)
-elif tri == "p":
-    env = AbstractPartialViewEnv(triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5),15)
+elif userInput == "p":
+    env = PartialViewEnv(triMesherEnv(size=26, seedValue=2, nLinesX = 5, nLinesY=5),15)
 else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)

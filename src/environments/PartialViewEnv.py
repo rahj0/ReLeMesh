@@ -1,6 +1,6 @@
 from environments.AbstractMeshEnv import *
 
-class AbstractPartialViewEnv(AbstractMeshEnv): 
+class PartialViewEnv(AbstractMeshEnv): 
     def __init__(self, environment, viewSize=15 , seedValue = 0, cornerMatchBonus = 30):
         self._fullEnv = environment
         AbstractMeshEnv.__init__(self, False, viewSize, environment.getActionCount(), seedValue, cornerMatchBonus)

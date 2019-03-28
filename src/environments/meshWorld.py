@@ -1,21 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 24 22:40:03 2018
-
-@author: Rasmus
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Tue May  8 22:44:07 2018
 
 @author: Rasmus
 """
-import sys
-import numpy as np
-import random
-import itertools
-import scipy.misc
 from abc import abstractmethod
 from gameObjects.squareObj import *
 from gameObjects.quadObj import *

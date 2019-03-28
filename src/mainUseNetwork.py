@@ -1,39 +1,29 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May  8 22:33:20 2018
+# Script for loading model and use it in an environemnt.
+# Use for evaluating model performance in a single run.
 
-@author: Rasmus
-"""
-
-from __future__ import division
-
-import numpy as np
-import random
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import matplotlib.pyplot as plt
-import scipy.misc
 import os
 import time
-"matplotlib inline"
-
 from environments.triMesherEnv import triMesherEnv
 from Networks.BasicQNetwork import *
+from environments.PartialViewEnv import PartialViewEnv
+from worldGenerators.ObjectInTheMiddleWorldGenerator import *
+from worldGenerators.simpleMeshWorldGenerator import *
 
-sizeEnv = 16
-# sizeEnv = 14, xLines = 2, xLines = 2 -> maxHumanScore ~ 3200
+sizeEnv = 15; xLines = 4; yLines = 4
 nChannels = 2
-env = triMesherEnv((sizeEnv-2), 0, 3, 3)
-print(env.actions)
+fullEnv = triMesherEnv(size=25, seedValue=2, nLinesX = xLines, nLinesY=yLines)
+fullEnv.setWorldGenerator(simpleMeshWorldGenerator(xLines,yLines,0,0))
+env = PartialViewEnv(fullEnv,sizeEnv)
     
 load_model = True #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
 h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 num_episodes = 1
-max_epLength = 110
+nEpisodesMax = 110 # Maximum number of 
 
 tf.reset_default_graph()
-mainQN = Qnetwork(h_size,env.actions,sizeEnv,env.getNumberOfChannels())
+mainQN = Qnetwork(h_size,env.getActionCount(),sizeEnv,env.getNumberOfChannels())
 
 init = tf.global_variables_initializer()
 
@@ -62,7 +52,7 @@ with tf.Session() as sess:
         rAll = 0
         j = 0
         #The Q-Network
-        while j < max_epLength: #If the agent takes longer than 200 moves to reach either of the blocks, end the trial.
+        while j < nEpisodesMax: #If the agent takes longer than 200 moves to reach either of the blocks, end the trial.
             j+=1
             #Choose an action by greedily (with e chance of random action) from the Q-network
             start = time.time()

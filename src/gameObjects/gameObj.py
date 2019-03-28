@@ -8,12 +8,8 @@ Created on Mon Jun 25 19:13:13 2018
 from math import atan, atan2
 from math import degrees, radians, pi
 
-class gameOb():
+class gameObject():
     def __init__(self,southWest,southEast,northWest,northEast,intensity,channel,reward,name):
-#        self.x = coordinates[0]
-#        self.y = coordinates[1]
-#        self.size = size
-        
         self.intensity = intensity
         self.channel = channel
         self.reward = reward
@@ -90,17 +86,6 @@ class gameOb():
     def calculateAngle(self, originPoint, secondPoint):
         difX = secondPoint[0] - originPoint[0]
         difY = secondPoint[1] - originPoint[1]
-#    
-#        angle = atan(abs(difY)/abs(difX))
-#        if(difX < 0.0 and difY > 0.0):
-#            print("1")
-#            angle += 0.5*pi
-#        if(difX < 0.0 and difY < 0.0):
-#            print("2")
-#            angle += pi
-#        if(difX > 0.0 and difY < 0.0):
-#            print("3")
-#            angle += 1.5*pi
         angle = atan2(difY,difX)
         if (angle<0.0):
             angle = 2*pi + angle
@@ -117,14 +102,6 @@ class gameOb():
         
     def getName(self):
         return self.name
-    
-    def printAngles(self):
-        pass
-#        print("SouthWest: ", self.calculateSouthWestCornerAngle())
-#        print("SouthEast: ", self.calculateSouthEastCornerAngle())
-#        print("NorthWest: ", self.calculateNorthWestCornerAngle())
-#        print("NorthEast: ", self.calculateNorthEastCornerAngle())
-#        print("")
     
     def changeNorthWest(self,xChange, yChange):
         oldCoordinate = self._northWest
@@ -190,18 +167,7 @@ class gameOb():
 def calculateAngle(originPoint, secondPoint):
     difX =secondPoint[0] - originPoint[0]
     difY =secondPoint[1] - originPoint[1]
-#    
-#    angle = atan(abs(difY)/abs(difX))
-#    
-#    if(difX < 0.0 and difY > 0.0):
-#        print("1")
-#        angle += 0.5*pi
-#    if(difX < 0.0 and difY < 0.0):
-#        print("2")
-#        angle += pi
-#    if(difX > 0.0 and difY < 0.0):
-#        print("3")
-#        angle += 1.5*pi
+
     return degrees(atan2(difY,difX))
     
     # ---------- 0 deg

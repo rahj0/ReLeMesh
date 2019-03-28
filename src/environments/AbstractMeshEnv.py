@@ -2,20 +2,14 @@
 """
 Created on Thu May 24 22:40:03 2018
 
-@author: Rasmus
+@author: Rasmus Hjort
 """
 
 # -*- coding: utf-8 -*-
-"""
-Created on Tue May  8 22:44:07 2018
-
-@author: Rasmus
-"""
 
 import numpy as np
 import random
 import itertools
-import scipy.misc
 import math
 from abc import abstractmethod, ABC
 from gameObjects.squareObj import *
@@ -238,6 +232,7 @@ class AbstractMeshEnv(ABC):
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
         reward = -0.5
         if newHero:
+            # print("new hero")
             self.saveHeroAsWall()
             if self._useCenterOfFocus == True:
                 self.pushToFrontStarterObjectNearestToPoint(self._centerOfFocus) 
@@ -252,13 +247,14 @@ class AbstractMeshEnv(ABC):
             hero.changeNorthWest(changeNorthEastX, changeNorthEastY)
        
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
-
+        self.objects[-1] = hero
+        
         if newHero:
             self._currentBonusValue = 0 
-        self.renderEnv()
-        # else:
-        #     self.refreshEnv() TODO Fix 
-
+            self.renderEnv()
+        else:
+            self.renderEnv()
+            
         idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
         actualArea = hero.getArea()
         
@@ -273,7 +269,7 @@ class AbstractMeshEnv(ABC):
         self._currentBonusValue = newBonusValue / self._normaliseValue
 
         reward =  reward / self._normaliseValue
-        self.objects[-1] = hero
+        
         return reward,done
         
     def countFilledPixels(self):
@@ -295,20 +291,27 @@ class AbstractMeshEnv(ABC):
                     if value < 0.51: # TODO: Remove hardcoded value
                         if self._state[i,j,1] > 0.0:
                             count += 1
-        print(count)
         return count
     def renderEnv(self):
         [status,state] =  self._render.renderEnv(self.objects)
         if status:
             self._state = state
+
             # self._state[0] = state[0]
             # self._state[1] = state[1]
 
     def refreshEnv(self):
-        [status,state] =  self._render.renderEnvObject(self.objects[-1],np.zeros([self._yRes,self._xRes]))
+        beforeRender = self._state
+        self.renderEnv()
+        [status,state] =  self._render.renderEnvObject(self.getHero(),np.zeros([self._yRes,self._xRes]))
         if status:
-            self._state[:,:,self.objects[-1].channel] = state
-    
+            beforeRender[:,:,0] = state
+        test = np.abs(np.subtract(beforeRender,self._state))
+        if np.amax(test) != 0.0:
+            print("\n\n")
+            print("max: ", np.amax(test))
+            self.printStats()
+
     def step(self,action):
         self._actions.append(action)
         reward,done = self.moveChar(action)

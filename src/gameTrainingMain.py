@@ -11,16 +11,12 @@ import argparse
 import numpy as np
 import random
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import matplotlib.pyplot as plt
-import scipy.misc
 import os
 import time
-"matplotlib inline"
 
 from environments.triMesherEnv import triMesherEnv
 from worldGenerators.ObjectInTheMiddleWorldGenerator import *
-from environments.AbstractPartialViewEnv import AbstractPartialViewEnv
+from environments.PartialViewEnv import PartialViewEnv
 from Networks.BasicQNetwork import *
 
 num_episodes = 0  #How many episodes of game environment to train network with.
@@ -38,31 +34,31 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
     sess.run(a)
 
-sizeEnv = 15, xLines = 5, yLines = 5
+sizeEnv = 15; xLines = 4; yLines = 4
 nChannels = 2
-fullEnv = triMesherEnv(size=31, seedValue=2, nLinesX = xLines, nLinesY=yLines)
-fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(xLines,yLines,0,0))
-env = AbstractPartialViewEnv(fullEnv,sizeEnv)
+fullEnv = triMesherEnv(size=25, seedValue=2, nLinesX = xLines, nLinesY=yLines)
+# fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(xLines,yLines,0,0))
+fullEnv.setWorldGenerator(simpleMeshWorldGenerator(xLines,yLines,0,0))
+env = PartialViewEnv(fullEnv,sizeEnv)
 
 multi = 1
 batch_size = 32*multi #How many experiences to use for each training step.
 update_freq = 4*multi #How often to perform a training step.
 y = .92 #Discount factor on the target Q-values
-startE = 0.8 #Starting chance of random action
-endE = 0.001 #Final chance of random action
-max_epLength = 180 #The max allowed length of our episode.
+startE = 0.6 #Starting chance of random action
+endE = 0.01 #Final chance of random action
+max_epLength = 175 #The max allowed length of our episode.
 
-
-multi2 = 15
-annealing_steps = int(400000*multi2*0.9) #How many steps of training to reduce startE to endE.
+multi2 = 5
+annealing_steps = int(400000*multi2*0.3) #How many steps of training to reduce startE to endE.
 num_episodes = int(5000*multi2) #How many episodes of game environment to train network with.
 
  #How many steps of training to reduce startE to endE.
 print("Annealing steps: ", annealing_steps)
 
-load_model = True #Whether to load a saved model.
+load_model = False #Whether to load a saved model.
 path = "./dqn" #The path to save our model to.
-h_size = 750 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
+h_size = 512 #The size of the final convolutional layer before splitting it into Advantage and Value streams.
 tau = 0.001 #Rate to update target network toward primary   
 bufferSize = 100000
 pre_train_steps = bufferSize #How many steps of random actions before training begins.
@@ -91,10 +87,9 @@ rList = []
 total_steps = 0
 
 #Make a path for our model to be saved in.
-
-
 if not os.path.exists(path):
     os.makedirs(path)
+
 last_avg = 0
 maxScore = 0
 last_max500 = 0
@@ -159,8 +154,8 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
 
                     networkTime += time.time() - start0
             rAll += r
-            # if rAll < -1.0:
-            #     d = True
+            if rAll < -5.0:
+                d = True
             s = s1
             
             if d == True:

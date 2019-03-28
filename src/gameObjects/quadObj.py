@@ -6,7 +6,7 @@ Created on Wed Oct 10 23:17:07 2018
 """
 from gameObjects.gameObj import *
 
-class quadObj(gameOb):
+class quadObj(gameObject):
     def __init__(self,coord1,coord2,intensity,channel,reward,name):
         southWest = (coord1[0],coord1[1])
         southEast = (coord2[0],coord2[1])
@@ -17,7 +17,7 @@ class quadObj(gameOb):
         northWest = (coord1[0]-yDif,coord1[1]+xDif)
         northEast = (coord2[0]-yDif,coord2[1]+xDif)
 #        print("P",southWest,southEast,northWest,northEast)
-        gameOb.__init__(self,southWest,southEast,northWest,northEast,intensity,channel,reward,name)
+        gameObject.__init__(self,southWest,southEast,northWest,northEast,intensity,channel,reward,name)
 
     def isNewShapeValid(self):
         angleTolerance = 1e-6

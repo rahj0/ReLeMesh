@@ -4,6 +4,7 @@ Created on Tue Sep 11 22:39:57 2018
 
 @author: Rasmus
 """
+# Abstract class for generating starting point for the Environments
 
 from abc import abstractmethod, ABC
 import random
@@ -43,20 +44,19 @@ class AbstractMeshWorldGenerator(ABC):
         southWestX = minX + cornerMovement[0][0]
         southWestY = minY + cornerMovement[0][1]
         southWest = (southWestX,southWestY)
-#        print(southWest)
+
         southEastX = maxX - cornerMovement[1][0]
         southEastY = minY + cornerMovement[1][1]
         southEast = (southEastX,southEastY)
-#        print(southEast)
+
         northWestX = minX + cornerMovement[2][0]
         northWestY = maxY - cornerMovement[2][1]   
         northWest = (northWestX,northWestY)
-#        print(northWest)
+
         northEastX = maxX - cornerMovement[3][0]
         northEastY = maxY - cornerMovement[3][1]  
         northEast = (northEastX,northEastY)
-#        print(northEast)
-        
+
         self._objects.append(lineOb((southWestX,southWestY),(southEastX,southEastY))) # south
         self._objects.append(lineOb((northWestX,northWestY),(southWestX,southWestY))) # West
         self._objects.append(lineOb((northEastX,northEastY),(northWestX,northWestY))) # North

@@ -97,6 +97,7 @@ class BasicEnvironmentRender():
 
         return pixels
     def renderEnvObject(self, item, state):
+        # print("render")
         bufferX = 0
         bufferY = 0
         maxIndexX = self._yRes-1
@@ -119,11 +120,11 @@ class BasicEnvironmentRender():
             wrongMove = False
             if [northWestCornerX,northWestCornerY] in pixelsWest[:-1]:
                 wrongMove = True
-            if [northWestCornerX,northWestCornerY] in pixelsEast[:-1]:
+            elif [northWestCornerX,northWestCornerY] in pixelsEast[:-1]:
                 wrongMove = True
-            if [northEastCornerX,northEastCornerY] in pixelsWest[:-1]:
+            elif [northEastCornerX,northEastCornerY] in pixelsWest[:-1]:
                 wrongMove = True
-            if [northEastCornerX,northEastCornerY] in pixelsEast[:-1]:
+            elif [northEastCornerX,northEastCornerY] in pixelsEast[:-1]:
                 wrongMove = True
             if wrongMove:
                 return [False, 0]
@@ -239,8 +240,12 @@ class BasicEnvironmentRender():
         for item in objects:
             item.intensity = 0.75
             ok,a[:,:,item.channel] = self.renderEnvObject(item, a[:,:,item.channel])
+            # print(item.channel)
+            # print(item.name)
+
             if not ok:
                 return [False,a]
+        # print("")
         b = a[:,:,0]
         c = a[:,:,1]
 

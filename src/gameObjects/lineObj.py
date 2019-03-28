@@ -12,7 +12,7 @@ class lineOb(squareObj):
         intensity = 1
         reward = None
         name = "line"
-        gameOb.__init__(self,coord1,coord2,coord1,coord2,intensity,channel,reward,name)
+        gameObject.__init__(self,coord1,coord2,coord1,coord2,intensity,channel,reward,name)
     def moveEast(self, xChange, yChange):
          self.changeNorthEast(self,xChange, yChange)
          self.changeNorthEast(self,xChange, yChange)

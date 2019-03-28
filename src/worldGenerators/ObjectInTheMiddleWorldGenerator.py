@@ -4,6 +4,9 @@ Created on Thu Oct 11 20:16:09 2018
 
 @author: Rasmus
 """
+# Generates a boundary using the SimpleWorldGenerator class and then places a 
+# single triObj in the middle.
+
 from gameObjects.lineObj import *
 from gameObjects.triObj import *
 from random import randint

@@ -17,6 +17,7 @@ class meshEnvViewer():
         self._gameOver = False
         self._env = env
         self._master = master
+        master.wm_title("ReLeMesh")
         self._canvasWidth = self._env.getSizeX()
         self._canvasHeight = self._env.getSizeY()
         self._lineDistance = lineDistance
@@ -54,7 +55,7 @@ class meshEnvViewer():
         
         Label(self.info_frame, text="Space: Change Corner to Control").pack()
         Label(self.info_frame, text="Arrow keys: Control selected corner position").pack()
-        
+        Label(self.info_frame, text="Enter: Next Object").pack()
         
         self._master.focus_set()
         self._master.bind("<space>", lambda e:self.callback_tab())
@@ -74,15 +75,10 @@ class meshEnvViewer():
         self._master.bind("7", lambda e:self.callback_key7())
         self._master.bind("8", lambda e:self.callback_key8())
         self._master.bind("q", lambda e:self.useNetworkToMove())
-        self._master.bind("z", lambda e:self.zoomToogle())
 
         self.score_frame.pack()
         self.top_frame.pack()
-#        self.bottom_frame.pack()
         self.info_frame.pack()
-        
-    def zoomToogle(self):
-        pass
 
     def doAction(self, action):
         self._actionCount += 1
@@ -171,10 +167,8 @@ class meshEnvViewer():
         self._canvas.delete("all")
 
     def createEmptyGrid(self):
-       # vertical lines at an interval of "line_distance" pixel
        for x in range(self._lineDistance,self._canvasPixelWidth,self._lineDistance):
           self._canvas.create_line(x, 0, x, self._canvasPxelHeight, fill="#476042")
-       # horizontal lines at an interval of "line_distance" pixel
        for y in range(self._lineDistance,self._canvasPxelHeight,self._lineDistance):
           self._canvas.create_line(0, y, self._canvasPixelWidth, y, fill="#476042")
                              
@@ -189,7 +183,7 @@ class meshEnvViewer():
             return
         x0 = (indexX+1)*self._lineDistance
         y0 = (self._canvasHeight - indexY)*self._lineDistance
-    #    y0 = (indexY + 1)*squareSize
+
         colorID = "yellow"
         if color == 2:
             colorID = "blue"
@@ -211,8 +205,6 @@ class meshEnvViewer():
 def createEnvCanvas(line_distance,tensor):
     canvas_width =  tensor.shape[0]
     canvas_height = tensor.shape[1] 
-#    print("canvas_width" , canvas_width)
-#    print("canvas_height" , canvas_height)
     pixelWidth=(canvas_width+2)*line_distance
     pixelHeight=(canvas_height+2)*line_distance
     b = Canvas(master, 

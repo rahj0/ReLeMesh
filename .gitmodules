@@ -1,0 +1,3 @@
+[submodule "src/lib"]
+	path = src/lib
+	url = https://gitlab.com/rasmushjort8/relemeshcpp.git

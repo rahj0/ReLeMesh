@@ -14,9 +14,8 @@ from environments.PartialViewEnv import *
 
 print("Select Environment: \np: Partial View Environment")
 print("t: Triangle Objects Environment\nq: Quad Objects Environment")
-print("c: C++ Triangle Objects Environment")
+print("c: C++ Triangle Objects Environment (Not fully implemented)")
 userInput = input('Enter choice:')
-pixelSize = 15
 if userInput == "t":
     pass
     env = triMesherEnv(size=17, seedValue=4, nLinesX = 4, nLinesY=4)
@@ -28,6 +27,7 @@ else:
     print("Using Quads")
     env = meshEnv(size=25, seedValue=2)
 master = Tk()
+pixelSize = 15 # X and Y Size of each pixel; used for painting canvas
 viewer = meshEnvViewer(master,env,pixelSize)
 
 mainloop()

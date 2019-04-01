@@ -38,7 +38,6 @@ class triMesherEnvCpp(AbstractMeshEnv):
         nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
         data = (c_float*(ySize*xSize*nChannels))()
         self._reLeMeshLib.step(self._testTriEnv,0,data)
-        self._reLeMeshLib.deleteEnvironment(self._testTriEnv)
         index = 0
         for i in range(nChannels):
             for j in range(xSize):
@@ -48,6 +47,7 @@ class triMesherEnvCpp(AbstractMeshEnv):
                     index += 1
                 print(myString)
             print("\n\n")
+        # TODO Clean up this and move to unit Tester
 
     def getMaxNumberOfHeros(self):
         return self._nLinesX * self._nLinesY/2 # TODO access through cpp lib  
@@ -62,3 +62,36 @@ class triMesherEnvCpp(AbstractMeshEnv):
         nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
         data = (c_float*(self.getSizeX()*self.getSizeY()*nChannels))()
         self._reLeMeshLib.step(self._testTriEnv,int(action),data)
+        state = np.zeros([self._yRes,self._xRes,2])
+        index = 0
+        for i in range(nChannels):
+            for j in range(self.getSizeX()):
+                for k in range(self.getSizeY()):
+                    state[j,k,i] = data[index]
+                    index += 1
+        reward = 0.5
+        done = False
+        return self.getState(),reward,done
+    
+    def getState(self):
+        nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
+        print(nChannels)
+        print(self.getSizeX())
+        print(self.getSizeY())
+        data = (c_float*(self.getSizeX()*self.getSizeY()*nChannels))()
+        print("Created Memory")
+        self._reLeMeshLib.getState(self._testTriEnv,data)
+        print("Got State")
+        index = 0
+
+        state = np.zeros([self._yRes,self._xRes,2])
+        for i in range(nChannels):
+            for j in range(self.getSizeX()):
+                for k in range(self.getSizeY()):
+                    state[j,k,i] = data[index]
+                    index += 1
+        return state
+    def getActionCount(self):
+        return 3 #TODO
+    def getMaxNumberOfHeros(self):
+        return 1000 #TODO

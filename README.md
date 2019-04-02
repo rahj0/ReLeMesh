@@ -15,10 +15,10 @@ The agent can choose to move the control point of the object or to declare the o
 
 The objective for the agent is to increase the score. The score is determined by following rules:
   * The score increases proportional to the number of colored pixels in the environment. 
-  * There is a penalty if a single object is too big.
-  * If the agent connects node there is a bonus value
+  * There is a penalty if an object is too big.
+  * If the agent connects node there is a bonus
   * Each time the agent performs a action there is a small penalty
-  * If two objects are overlapping(except for boundaries) there is a penalty
+  * If two objects are overlapping(except for the boundaries of the objects) there is a penalty
 
 ## Prerequisites
 
@@ -26,6 +26,7 @@ The objective for the agent is to increase the score. The score is determined by
 * TensorFlow 1.13.1
 * Numpy 1.16.2
 * g++ 8.2.0 (Only need for Environments based on c++)
+* Boost 1.69 (Only used for unit tests)
 
 ## Getting Started
 
@@ -36,22 +37,28 @@ python3 MeshEnvViewerGame.py
 ```
 NB: The option "C++ Triangle Objects Environment" is only availble if you build the c++ extension project. See details below.
 
-To build the shared lib simply
+Training the agent: 
 ```
-mkdir lib && mkdir bin
-make
+cd src
+python3 gameTrainingMain.py
 ```
+This will create save the model which can then be used by running the following code
+```
+python3 mainUseNetworkInViewer.py
+```
+This will launch the viewer, where pressing "q" on the keyboard wil run the neural network to get the agents decision.
 
-Running the tests
-```
-make test
-```
 
-Running the python interface test:
+To build the shared lib:
 ```
-make pyTest
+git submodule init src/lib
+git submodule update src/lib
+mkdir src/lib/lib 
+mkdir src/lib/lib/debug
+mkdir src/lib/lib/test
+mkdir src/lib/bin
+make libOnly -C src/lib
 ```
-
 ## Author
 
 * **Rasmus O. Hjort** -[LinkedIn](linkedin.com/in/rasmus-o-hjort-b8179289)

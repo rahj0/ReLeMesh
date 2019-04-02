@@ -6,7 +6,13 @@ This allows us to perform simulations of fluid dynamics and other physical simul
 The quality of the mesh is espacially important for the accurracy of the simulation and is often a timeconsuming task for engineers. 
 Traditionally this process is performed by algorithms controlled by user input. 
 
-### Prerequisites
+## Method
+
+The agent used to generate mesh starts with an almost empty empty environemnt. 
+![load](https://raw.githubusercontent.com/rahj0/ReLeMesh/Master/example.gif)
+The green pixels represents fixed elements while the red pixels represents an element which the agent can modify. The darker pixels represents control points or nodes in an element. The objective for the agent is to increase the score. The score increases proportional to the number of colored pixels in the environment.
+
+## Prerequisites
 
 * Python 3.6
 * TensorFlow 1.13.1

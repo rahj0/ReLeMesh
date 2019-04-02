@@ -7,10 +7,13 @@ The quality of the mesh is espacially important for the accurracy of the simulat
 Traditionally this process is performed by algorithms controlled by user input. 
 
 ## Method
+I use reinforcement learning to train an agent which generates the mesh. The agent starts with an environment containing maybe some boundaries, represented by green pixels in the example below. The environment also contains an object the agent can modify, represented by the red pixels. The darker pixels represents control points(nodes) in an element.   
 
-The agent used to generate mesh starts with an almost empty empty environemnt. 
+The agent can choose to move the control point of the object or to declare the object to be finished. If the agent chooses to finish the object, the object will turn green indicating that it is now fixed. Also, a new object appears in red, which the agent can now modify. 
+ 
 ![load](https://raw.githubusercontent.com/rahj0/ReLeMesh/master/example.gif)
-The green pixels represents fixed elements while the red pixels represents an element which the agent can modify. The darker pixels represents control points or nodes in an element. The objective for the agent is to increase the score. The score increases proportional to the number of colored pixels in the environment.
+
+The objective for the agent is to increase the score. The score increases proportional to the number of colored pixels in the environment. There is a penalty if a single object is too big.
 
 ## Prerequisites
 

@@ -9,7 +9,7 @@ Traditionally this process is performed by algorithms controlled by user input.
 ## Method
 
 The agent used to generate mesh starts with an almost empty empty environemnt. 
-![load](https://raw.githubusercontent.com/rahj0/ReLeMesh/Master/example.gif)
+![load](https://raw.githubusercontent.com/rahj0/ReLeMesh/master/example.gif)
 The green pixels represents fixed elements while the red pixels represents an element which the agent can modify. The darker pixels represents control points or nodes in an element. The objective for the agent is to increase the score. The score increases proportional to the number of colored pixels in the environment.
 
 ## Prerequisites

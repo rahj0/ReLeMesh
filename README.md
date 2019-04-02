@@ -1,7 +1,7 @@
 # ReLeMesh 
 Mesh Generator based on Deep Reinforcement Learning methods. 
 
-Mesh generation, see [wiki](https://en.wikipedia.org/wiki/Mesh_generation), is a process of subdividing a continoues domain into a discrete representation. 
+Mesh generation is a process of subdividing a continoues domain into a discrete representation, , see [wiki](https://en.wikipedia.org/wiki/Mesh_generation). 
 This allows us to perform simulations of fluid dynamics and other physical simulations but are also used in many fields. 
 The quality of the mesh is espacially important for the accurracy of the simulation and is often a timeconsuming task for engineers. 
 Traditionally this process is performed by algorithms controlled by user input. 

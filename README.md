@@ -13,7 +13,12 @@ The agent can choose to move the control point of the object or to declare the o
  
 ![load](https://raw.githubusercontent.com/rahj0/ReLeMesh/master/example.gif)
 
-The objective for the agent is to increase the score. The score increases proportional to the number of colored pixels in the environment. There is a penalty if a single object is too big.
+The objective for the agent is to increase the score. The score is determined by following rules:
+  * The score increases proportional to the number of colored pixels in the environment. 
+  * There is a penalty if a single object is too big.
+  * If the agent connects node there is a bonus value
+  * Each time the agent performs a action there is a small penalty
+  * If two objects are overlapping(except for boundaries) there is a penalty
 
 ## Prerequisites
 
@@ -23,6 +28,13 @@ The objective for the agent is to increase the score. The score increases propor
 * g++ 8.2.0 (Only need for Environments based on c++)
 
 ## Getting Started
+
+To run the environment yourself (Be the agent!):
+```
+cd src
+python3 MeshEnvViewerGame.py
+```
+NB: The option "C++ Triangle Objects Environment" is only availble if you build the c++ extension project. See details below.
 
 To build the shared lib simply
 ```

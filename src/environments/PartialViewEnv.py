@@ -29,7 +29,6 @@ class PartialViewEnv(AbstractMeshEnv):
 
     def getState(self):
         state = self._fullEnv.getState()
-        print(state.shape)
         return self.cutState(state)
 
     def calculateRangeFromCenterPoint(self, centerValue, frameSize, fullEnvSize):

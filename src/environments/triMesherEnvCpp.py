@@ -10,7 +10,6 @@ class triMesherEnvCpp(AbstractMeshEnv):
         actions = 9
         AbstractMeshEnv.__init__(self, False, size, actions, seedValue)
         self.setWorldGenerator(simpleMeshWorldGenerator(nLinesX,nLinesY, 0, 0))
-        print(os.system("ls"))
         exists = os.path.isfile(sharedLibPath)
         if not exists:
             print("Shared object not found!")

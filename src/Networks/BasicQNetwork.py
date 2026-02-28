@@ -1,86 +1,67 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue May  8 22:33:20 2018
-
-@author: Rasmus
-"""
-
-from __future__ import division
-
 import numpy as np
 import random
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import os
-import time
-"matplotlib inline"
 
-class Qnetwork():
-    def __init__(self,h_size,envActions,sizeEnv,nChannels):
-        #The network recieves a frame from the game, flattened into an array.
-        #It then resizes it and processes it through four convolutional layers.
-        self.scalarInput =  tf.placeholder(shape=[None,sizeEnv*sizeEnv*nChannels],dtype=tf.float32)
-        self.imageIn = tf.reshape(self.scalarInput,shape=[-1,sizeEnv,sizeEnv,nChannels])
-        self.conv1 = slim.conv2d( \
-            inputs=self.imageIn,num_outputs=64,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
-        print(self.conv1.shape)    
-        self.conv2 = slim.conv2d( \
-            inputs=self.conv1,num_outputs=128,kernel_size=[4,4],stride=[2,2],padding='VALID', biases_initializer=None)
-        print(self.conv2.shape)  
-        self.conv4 = slim.conv2d( \
-            inputs=self.conv2,num_outputs=h_size,kernel_size=[2,2],stride=[1,1],padding='VALID', biases_initializer=None)
-        print(self.conv4.shape)   
-        
-        #We take the output from the final convolutional layer and split it into separate advantage and value streams.
-        self.streamAC,self.streamVC = tf.split(self.conv4,2,3)
-        self.streamA = slim.flatten(self.streamAC)
-        self.streamV = slim.flatten(self.streamVC)
-        xavier_init = tf.contrib.layers.xavier_initializer()
-        self.AW = tf.Variable(xavier_init([h_size//2,envActions]))
-        self.VW = tf.Variable(xavier_init([h_size//2,1]))
-        self.Advantage = tf.matmul(self.streamA,self.AW)
-        self.Value = tf.matmul(self.streamV,self.VW)
-        
-        #Then combine them together to get our final Q-values.
-        self.Qout = self.Value + tf.subtract(self.Advantage,tf.reduce_mean(self.Advantage,axis=1,keep_dims=True))
-        self.predict = tf.argmax(self.Qout,1)
-        
-        #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
-        self.targetQ = tf.placeholder(shape=[None],dtype=tf.float32)
-        self.actions = tf.placeholder(shape=[None],dtype=tf.int32)
-        self.actions_onehot = tf.one_hot(self.actions,envActions,dtype=tf.float32)
-        
-        self.Q = tf.reduce_sum(tf.multiply(self.Qout, self.actions_onehot), axis=1)
-        
-        self.td_error = tf.square(self.targetQ - self.Q)
-        self.loss = tf.reduce_mean(self.td_error)
-        self.trainer = tf.train.AdamOptimizer(learning_rate=0.0001)
-        self.updateModel = self.trainer.minimize(self.loss)
-        
+
+class Qnetwork(tf.keras.Model):
+    def __init__(self, h_size, envActions, sizeEnv, nChannels):
+        super().__init__()
+        self.sizeEnv = sizeEnv
+        self.nChannels = nChannels
+        self.h_size = h_size
+        self.envActions = envActions
+
+        self.conv1 = tf.keras.layers.Conv2D(
+            64, [4, 4], strides=[2, 2], padding='valid', use_bias=False)
+        self.conv2 = tf.keras.layers.Conv2D(
+            128, [4, 4], strides=[2, 2], padding='valid', use_bias=False)
+        self.conv3 = tf.keras.layers.Conv2D(
+            h_size, [2, 2], strides=[1, 1], padding='valid', use_bias=False)
+        self.flat = tf.keras.layers.Flatten()
+        # Dueling streams: advantage and value
+        self.advantage_dense = tf.keras.layers.Dense(
+            envActions, use_bias=False, kernel_initializer='glorot_uniform')
+        self.value_dense = tf.keras.layers.Dense(
+            1, use_bias=False, kernel_initializer='glorot_uniform')
+
+    def call(self, x):
+        x = tf.cast(x, tf.float32)
+        x = tf.reshape(x, [-1, self.sizeEnv, self.sizeEnv, self.nChannels])
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        # Split along channel axis into advantage and value streams
+        streamA, streamV = tf.split(x, 2, axis=3)
+        streamA = self.flat(streamA)
+        streamV = self.flat(streamV)
+        advantage = self.advantage_dense(streamA)
+        value = self.value_dense(streamV)
+        qout = value + (advantage - tf.reduce_mean(advantage, axis=1, keepdims=True))
+        return qout
+
+    def predict_action(self, x):
+        return tf.argmax(self(x), axis=1)
+
+
 class experience_buffer():
-    def __init__(self, buffer_size = 10000):
+    def __init__(self, buffer_size=10000):
         self.buffer = []
         self.buffer_size = buffer_size
-    
-    def add(self,experience):
+
+    def add(self, experience):
         if len(self.buffer) + len(experience) >= self.buffer_size:
-            self.buffer[0:(len(experience)+len(self.buffer))-self.buffer_size] = []
+            self.buffer[0:(len(experience) + len(self.buffer)) - self.buffer_size] = []
         self.buffer.extend(experience)
-            
-    def sample(self,size):
-        return np.reshape(np.array(random.sample(self.buffer,size)),[size,5])
-    
-def processState(states,sizeEnv,nChannels):
-    return np.reshape(states,[sizeEnv*sizeEnv*nChannels])
+
+    def sample(self, size):
+        return np.reshape(np.array(random.sample(self.buffer, size), dtype=object), [size, 5])
 
 
-def updateTargetGraph(tfVars,tau):
-    total_vars = len(tfVars)
-    op_holder = []
-    for idx,var in enumerate(tfVars[0:total_vars//2]):
-        op_holder.append(tfVars[idx+total_vars//2].assign((var.value()*tau) + ((1-tau)*tfVars[idx+total_vars//2].value())))
-    return op_holder
+def processState(states, sizeEnv, nChannels):
+    return np.reshape(states, [sizeEnv * sizeEnv * nChannels])
 
-def updateTarget(op_holder,sess):
-    for op in op_holder:
-        sess.run(op)
+
+def updateTarget(mainQN, targetQN, tau):
+    for main_var, target_var in zip(mainQN.trainable_variables, targetQN.trainable_variables):
+        target_var.assign(tau * main_var + (1 - tau) * target_var)

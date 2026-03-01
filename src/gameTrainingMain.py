@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import json
 import numpy as np
 import random
 import tensorflow as tf
@@ -15,10 +16,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--episodes', dest='nEpisodes', default=5000, type=int,
                         help='Number of episodes to run in training.')
+    parser.add_argument('--load-model', dest='loadModel', action='store_true',
+                        help='Resume training from saved model checkpoint.')
     args = parser.parse_args()
     num_episodes = args.nEpisodes
+    load_model = args.loadModel
 else:
     num_episodes = 5000
+    load_model = False
 
 sizeEnv = 15; xLines = 4; yLines = 4
 nChannels = 2
@@ -35,7 +40,6 @@ max_epLength = 175    # The max allowed length of an episode.
 annealing_steps = int(400000 * 5 * 0.3)  # Steps to reduce startE to endE.
 print("Annealing steps: ", annealing_steps)
 
-load_model = False    # Whether to load a saved model.
 path = "./dqn"        # The path to save our model to.
 h_size = 512          # Size of the final conv layer before dueling split.
 tau = 0.001           # Rate to update target network toward primary.
@@ -78,6 +82,15 @@ if load_model:
     print('Loading Model...')
     mainQN.load_weights(path + '/model-final.weights.h5')
     targetQN.load_weights(path + '/model-final.weights.h5')
+    state_path = path + '/train-state.json'
+    if os.path.exists(state_path):
+        with open(state_path) as f:
+            train_state = json.load(f)
+        total_steps = train_state['total_steps']
+        e = max(endE, train_state['e'])
+        print(f'Resumed: total_steps={total_steps}, e={e:.4f}')
+    else:
+        print('No train-state.json found, starting epsilon/steps from scratch.')
 
 for i in range(num_episodes):
     episodeBuffer = experience_buffer()
@@ -165,6 +178,8 @@ for i in range(num_episodes):
         print("Total steps: ", total_steps)
         print("Env time: ", envRenderTime)
         print("Network time: ", networkTime)
+        with open(path + '/train-state.json', 'w') as f:
+            json.dump({'total_steps': total_steps, 'e': e}, f)
     if len(rList) % 100 == 0:
         mean500 = np.mean(rList[-500:])
         max500 = np.max(rList[-500:])
@@ -173,6 +188,8 @@ for i in range(num_episodes):
         last_max500 = max500
 
 mainQN.save_weights(path + '/model-final.weights.h5')
+with open(path + '/train-state.json', 'w') as f:
+    json.dump({'total_steps': total_steps, 'e': e}, f)
 print("Percent of succesful episodes: " + str(sum(rList) / num_episodes) + "%")
 print("Best Score: ", maxScore)
 print("Best Score Action list: ", bestActions)

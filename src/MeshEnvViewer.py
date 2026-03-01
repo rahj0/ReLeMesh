@@ -10,9 +10,8 @@ import numpy as np
 from Networks.BasicQNetwork import *
 
 class meshEnvViewer():
-    def __init__(self, master, env, lineDistance = 10, tfSession = None, qNetwork = None, resetOnStart = False):
+    def __init__(self, master, env, lineDistance = 10, qNetwork = None, resetOnStart = False):
         self._actionCount = 0
-        self._tfSession = tfSession
         self._qNetwork = qNetwork
         self._gameOver = False
         self._env = env
@@ -147,10 +146,9 @@ class meshEnvViewer():
         if not self._gameOver:
             self.doAction(8)
     def useNetworkToMove(self):
-        if self._tfSession != None:
-            print(self._env.getSizeX())
+        if self._qNetwork is not None:
             s = processState(self._env.getState(), self._env.getSizeX(), self._env.getNumberOfChannels())
-            a = self._tfSession.run(self._qNetwork.predict,feed_dict={self._qNetwork.scalarInput:[s]})[0]
+            a = self._qNetwork.predict_action(np.array([s], dtype=np.float32)).numpy()[0]
             self.doAction(a)
 
     def paintState(self,state):

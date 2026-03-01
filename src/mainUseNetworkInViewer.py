@@ -1,56 +1,42 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue May  8 22:33:20 2018
-
-@author: Rasmus
-"""
-import tensorflow as tf
+import numpy as np
 import os
 from tkinter import *
-from MeshEnvViewer import *
+from MeshEnvViewer import meshEnvViewer
 from environments.triMesherEnv import triMesherEnv
 from environments.PartialViewEnv import PartialViewEnv
-from Networks.BasicQNetwork import *
-from worldGenerators.ObjectInTheMiddleWorldGenerator import *
-from worldGenerators.simpleMeshWorldGenerator import *
+from Networks.BasicQNetwork import Qnetwork, processState
+from worldGenerators.simpleMeshWorldGenerator import simpleMeshWorldGenerator
 
 sizeEnv = 15; xLines = 4; yLines = 4
 nChannels = 2
-fullEnv = triMesherEnv(size=25, seedValue=2, nLinesX = xLines, nLinesY=yLines)
-# fullEnv.setWorldGenerator(ObjectInTheMiddleWorldGenerator(xLines,yLines,0,0))
-fullEnv.setWorldGenerator(simpleMeshWorldGenerator(xLines,yLines,0,0))
-env = PartialViewEnv(fullEnv,sizeEnv)
+fullEnv = triMesherEnv(size=25, seedValue=2, nLinesX=xLines, nLinesY=yLines)
+fullEnv.setWorldGenerator(simpleMeshWorldGenerator(xLines, yLines, 0, 0))
+env = PartialViewEnv(fullEnv, sizeEnv)
 
-load_on_init = True #Load saved model on start
-saveModelPath = "./dqn" #The path to save our model to.
-h_size = 512 #The size of the final convolutional
-showFinalState = True # Show the final state after in new window after running
-tf.reset_default_graph()
-mainQN = Qnetwork(h_size,env.getActionCount(),sizeEnv,env.getNumberOfChannels())
+saveModelPath = "./dqn"
+h_size = 512
+showFinalState = True  # After running, open a second window showing the full 25x25 result
 
-init = tf.global_variables_initializer()
-saver = tf.train.Saver()
+mainQN = Qnetwork(h_size, env.getActionCount(), sizeEnv, env.getNumberOfChannels())
 
-#Make a path for saving if not already there
-if not os.path.exists(saveModelPath):
-    os.makedirs(saveModelPath)
+# Build weights with a dummy forward pass, then load checkpoint.
+dummy = np.zeros([1, sizeEnv * sizeEnv * nChannels], dtype=np.float32)
+mainQN(dummy)
 
-envRenderTime = 0.0
-networkTime = 0.0
-actions_ = []
-with tf.Session() as sess:
-    sess.run(init)
-    if load_on_init == True:
-        model = tf.train.get_checkpoint_state(saveModelPath)
-        saver.restore(sess,model.model_checkpoint_path)
-    master = Tk()
-    viewer = meshEnvViewer(master,env,20,sess, mainQN)
+if not os.path.exists(saveModelPath + '/model-final.weights.h5'):
+    print("No saved model found at:", saveModelPath)
+    print("Train first with: python3 gameTrainingMain.py --episodes 5000")
+    exit()
 
-    mainloop()
+mainQN.load_weights(saveModelPath + '/model-final.weights.h5')
+print("Model loaded from", saveModelPath)
+
+master = Tk()
+viewer = meshEnvViewer(master, env, 20, qNetwork=mainQN)
+mainloop()
 
 if showFinalState:
     master = Tk()
-    viewer = meshEnvViewer(master,fullEnv,20,sess,False)
+    viewer = meshEnvViewer(master, fullEnv, 20)
     mainloop()
-
-

@@ -8,6 +8,13 @@ Created on Thu May 24 22:40:03 2018
 # -*- coding: utf-8 -*-
 
 import numpy as np
+
+# Pixel intensity values used by BasicEnvironmentRender:
+#   0.5  = interior fill of a mesh element
+#   0.75 = edge line
+#   1.0  = corner node
+# Pixels strictly below this threshold are interior-only pixels.
+_INTERIOR_PIXEL_MAX = 0.51
 import random
 import itertools
 import math
@@ -90,9 +97,8 @@ class AbstractMeshEnv(ABC):
         self.objects.extend(self._worldGenerator.getObjects())
         self.startObjects.extend(self._worldGenerator.getStartObjects())
         shuffle(self.startObjects)
-        hero = self.createNewHero()
+        hero = self.createNewHero()  # also appends hero to self.objects
         self._nHeros += 1
-        self.objects.append(hero) 
         for gameObject in self.objects:
             self.resizeObjToFitEnv(gameObject)
         self.renderEnv()  
@@ -225,57 +231,76 @@ class AbstractMeshEnv(ABC):
     def moveChar(self,direction):
         if self._done:
             return 0, True
-        # 0 - up, 1 - down, 2 - left, 3 - right
         hero = self.objects[-1]
-        heroBackup = self.objects[-1]
         done = False
         (changeNorthWestX, changeNorthWestY, changeNorthEastX, changeNorthEastY, newHero) = self.convertStepInput(direction)
         reward = -0.5
-        if newHero:
-            # print("new hero")
-            self.saveHeroAsWall()
-            if self._useCenterOfFocus == True:
-                self.pushToFrontStarterObjectNearestToPoint(self._centerOfFocus) 
+        idealArea = self.getIdealObjectArea(0,0)
 
-            if (len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros()):
-                hero= self.createNewHero() 
-                self._nHeros += 1   
+        if newHero:
+            # Capture the placed triangle's quality BEFORE saveHeroAsWall() changes
+            # which object is the hero.  This correctly rewards the agent for the
+            # triangle it shaped, not the new hero's random starting position.
+            place_quality = self._currentBonusValue * self._normaliseValue
+            corner_bonus  = self.calculateFinishedObjectBonusReward()
+
+            self.saveHeroAsWall()
+            if self._useCenterOfFocus:
+                self.pushToFrontStarterObjectNearestToPoint(self._centerOfFocus)
+            # Discard any start objects whose edge is already fully covered in
+            # channel 1.  This can happen when later placements fill an edge that
+            # was queued as a start object by an earlier triangle.
+            while self.startObjects:
+                nw = self.startObjects[0].getNorthWest()
+                ne = self.startObjects[0].getNorthEast()
+                edge_free = any(
+                    self._state[px[0], px[1], 1] == 0.0
+                    for px in BasicEnvironmentRender.computePixelsFromLine(
+                        nw[0], nw[1], ne[0], ne[1])
+                )
+                if edge_free:
+                    break
+                self.startObjects.pop(0)  # edge fully covered — skip
+
+            if len(self.startObjects) > 0 and self._nHeros < self.getMaxNumberOfHeros():
+                hero = self.createNewHero()
+                self._nHeros += 1
             else:
                 done = True
         else:
-            hero.changeNorthEast(changeNorthWestX, changeNorthWestY)            
+            hero.changeNorthEast(changeNorthWestX, changeNorthWestY)
             hero.changeNorthWest(changeNorthEastX, changeNorthEastY)
-       
-        (hero,outOfbound) = self.resizeObjToFitEnv(hero)
-        self.objects[-1] = hero
-        
-        if newHero:
-            self._currentBonusValue = 0 
-            self.renderEnv()
-        else:
-            self.renderEnv()
-            
-        idealArea = self.getIdealObjectArea(0,0) # atm ideal area is not a function of the coordinates
-        actualArea = hero.getArea()
-        
-        newBonusValue = actualArea 
-        newBonusValue -= pow(abs(actualArea-idealArea),1.5) 
-        # print("Area: ",actualArea)
-        # print("idealArea:", idealArea)
-        # print("Penalty: ", pow(abs(actualArea-idealArea),1.5))
-        newBonusValue -= self.countOverlappingPixels()*self._overlappingPixelPenalty
-        newBonusValue += self.calculateFinishedObjectBonusReward()
-        reward += newBonusValue- self._currentBonusValue* self._normaliseValue
-        self._currentBonusValue = newBonusValue / self._normaliseValue
 
-        reward =  reward / self._normaliseValue
-        
-        return reward,done
+        (hero, outOfbound) = self.resizeObjToFitEnv(hero)
+        self.objects[-1] = hero
+        self.renderEnv()
+
+        if newHero:
+            # Set the new hero's starting quality as the baseline so future
+            # movement rewards measure improvement from this starting point.
+            actualArea = hero.getArea()
+            new_start = actualArea - pow(abs(actualArea - idealArea), 1.5)
+            new_start -= self.countOverlappingPixels() * self._overlappingPixelPenalty
+            self._currentBonusValue = new_start / self._normaliseValue
+            reward += place_quality + corner_bonus
+        else:
+            actualArea = hero.getArea()
+            newBonusValue = actualArea - pow(abs(actualArea - idealArea), 1.5)
+            newBonusValue -= self.countOverlappingPixels() * self._overlappingPixelPenalty
+            # Corner bonus is NOT included here — it is counted exactly once, at
+            # placement (see below).  Including it in movement updates would cause
+            # it to be double-counted at placement time and would give the agent a
+            # "free" +CB delta on the first step of every new hero.
+            reward += newBonusValue - self._currentBonusValue * self._normaliseValue
+            self._currentBonusValue = newBonusValue / self._normaliseValue
+
+        reward = reward / self._normaliseValue
+        return reward, done
         
     def countFilledPixels(self):
         count = 0
         for i in range(self._state.shape[0]):
-            for j in range(self._state.shape[0]):
+            for j in range(self._state.shape[1]):
                 if self._state[i,j,1] > 0.0:
                     count += 1
                 elif self._state[i,j,0] > 0.0:
@@ -285,10 +310,10 @@ class AbstractMeshEnv(ABC):
     def countOverlappingPixels(self):
         count = 0
         for i in range(self._state.shape[0]):
-            for j in range(self._state.shape[0]):
+            for j in range(self._state.shape[1]):
                 value = self._state[i,j,0]
                 if value > 0.0:
-                    if value < 0.51: # TODO: Remove hardcoded value
+                    if value < _INTERIOR_PIXEL_MAX:  # interior fill=0.5; edges/corners >= 0.75
                         if self._state[i,j,1] > 0.0:
                             count += 1
         return count

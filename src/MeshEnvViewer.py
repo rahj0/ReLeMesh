@@ -77,6 +77,7 @@ class meshEnvViewer():
 
         self.score_frame.pack()
         self.top_frame.pack()
+        self.bottom_frame.pack()
         self.info_frame.pack()
 
     def doAction(self, action):
@@ -147,9 +148,21 @@ class meshEnvViewer():
             self.doAction(8)
     def useNetworkToMove(self):
         if self._qNetwork is not None:
+            import torch
             s = processState(self._env.getState(), self._env.getSizeX(), self._env.getNumberOfChannels())
-            a = self._qNetwork.predict_action(np.array([s], dtype=np.float32)).numpy()[0]
-            self.doAction(a)
+            device = next(self._qNetwork.parameters()).device
+            s_t = torch.from_numpy(s).unsqueeze(0).to(device)
+            a = self._qNetwork.predict_action(s_t).item()
+            # Bypass doAction() — the corner-offset logic there is for manual
+            # control only and must not be applied to the network's action.
+            state, reward, done = self._env.step(a)
+            self._actionCount += 1
+            self._score += reward
+            self.paintState(state)
+            self._scoreLabel.config(text=f'Score: {self._score:.4f}')
+            if done:
+                self._gameOver = True
+                self._scoreLabel.config(text=f'Score: {self._score:.4f}  --Game Over--')
 
     def paintState(self,state):
         self.clearCanvas()
@@ -197,7 +210,7 @@ class meshEnvViewer():
                 colorID = "#ffbbbb"
             elif intensity < 1.0:
                 colorID = "#ff7877"
-                
+
         self._canvas.create_rectangle(x0, y0, x0 + self._lineDistance, y0 + self._lineDistance, fill=colorID)
 
 def createEnvCanvas(line_distance,tensor):

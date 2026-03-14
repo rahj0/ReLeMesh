@@ -1,96 +1,142 @@
-from ctypes import *
+"""C++ backend wrapper for the ReLeMesh triangular mesh environment.
+
+Delegates all environment logic to the compiled ReLeMeshInterface.so shared
+library via ctypes.  The Python layer handles only buffer management and the
+CHW→HWC state transposition required by the training pipeline.
+
+C++ state layout:  [nChannels, sizeX, sizeY]  (channel-first, written by step())
+Python pipeline:   [sizeX, sizeY, nChannels]  (HWC, consumed by processState())
+"""
+
+from ctypes import CDLL, c_int, c_float, c_bool, c_void_p, POINTER, byref
+import numpy as np
 import os
-from environments.AbstractMeshEnv import *
 
-class triMesherEnvCpp(AbstractMeshEnv):
-
-    def __init__(self,size, seedValue = 0, nLinesY = 3, nLinesX = 3, sharedLibPath = "lib/bin/ReLeMeshInterface.so"):
-        self._nLinesX = nLinesX
-        self._nLinesY = nLinesY
-        actions = 9
-        AbstractMeshEnv.__init__(self, False, size, actions, seedValue)
-        self.setWorldGenerator(simpleMeshWorldGenerator(nLinesX,nLinesY, 0, 0))
-        exists = os.path.isfile(sharedLibPath)
-        if not exists:
-            print("Shared object not found!")
-            print("Expected path: ", sharedLibPath)
-            exit()
-        self._reLeMeshLib = CDLL(sharedLibPath)
+_DEFAULT_LIB = os.path.normpath(os.path.join(
+    os.path.dirname(__file__),
+    '../../../ReLeMeshCppv2/bin/ReLeMeshInterface.so'
+))
 
 
-        self._reLeMeshLib.createTriMeshEnvironment.restype = c_void_p
-        self._reLeMeshLib.deleteEnvironment.restype = None
-        self._reLeMeshLib.step.restype = None
-        self._reLeMeshLib.getSizeX.restype = c_int
-        self._reLeMeshLib.getSizeY.restype = c_int
-        self._reLeMeshLib.getChannelCount.restype = c_int
+class triMesherEnvCpp:
+    """Thin Python wrapper around the C++ ReLeMesh environment.
 
-        self._reLeMeshLib.step.argtypes = [c_void_p,c_int,POINTER(c_float)]
+    Implements the same public interface as triMesherEnv so it can be used
+    as a drop-in replacement in the training script (without PartialViewEnv).
+    """
 
-        self._testTriEnv = self._reLeMeshLib.createTriMeshEnvironment(size,size)
-        xSize = self._reLeMeshLib.getSizeX(self._testTriEnv)
-        ySize = self._reLeMeshLib.getSizeY(self._testTriEnv)
-        if size != xSize:
-            print("Error creating c++ triMesherEnv: Size does match python size")
-        if size != ySize:
-            print("Error creating c++ triMesherEnv: Size does match python size")
-        nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
-        data = (c_float*(ySize*xSize*nChannels))()
-        self._reLeMeshLib.step(self._testTriEnv,0,data)
-        index = 0
-        for i in range(nChannels):
-            for j in range(xSize):
-                myString = "E  "
-                for k in range(ySize):
-                    myString += str(int(data[index])) + " "
-                    index += 1
-                print(myString)
-            print("\n\n")
-        # TODO Clean up this and move to unit Tester
+    def __init__(self, size, nLinesX=3, nLinesY=3, lib_path=None):
+        if lib_path is None:
+            lib_path = _DEFAULT_LIB
+        if not os.path.isfile(lib_path):
+            raise FileNotFoundError(
+                f'C++ library not found at: {lib_path}\n'
+                f'Build with: cd ReLeMeshCppv2 && make bin/ReLeMeshInterface.so'
+            )
 
-    def getMaxNumberOfHeros(self):
-        return self._nLinesX * self._nLinesY/2 # TODO access through cpp lib  
+        lib = CDLL(lib_path)
+        lib.createTriMeshEnvironment.restype  = c_void_p
+        lib.createTriMeshEnvironment.argtypes = [c_int, c_int]
+        lib.reset.restype   = None
+        lib.reset.argtypes  = [c_void_p]
+        lib.step.restype    = None
+        lib.step.argtypes   = [c_void_p, c_int, POINTER(c_float), POINTER(c_bool), POINTER(c_float)]
+        lib.getState.restype   = None
+        lib.getState.argtypes  = [c_void_p, POINTER(c_float)]
+        lib.getActionCount.restype    = c_int
+        lib.getActionCount.argtypes   = [c_void_p]
+        lib.getMaxNumberOfHeros.restype  = c_int
+        lib.getMaxNumberOfHeros.argtypes = [c_void_p, POINTER(c_float)]
+        lib.getChannelCount.restype   = c_int
+        lib.getChannelCount.argtypes  = [c_void_p]
+        lib.getSizeX.restype  = c_int
+        lib.getSizeX.argtypes = [c_void_p]
+        lib.getSizeY.restype  = c_int
+        lib.getSizeY.argtypes = [c_void_p]
+        lib.deleteEnvironment.restype  = None
+        lib.deleteEnvironment.argtypes = [c_void_p]
 
-    def createNewHero(self):
-        print("createNewHero")
+        self._lib = lib
+        self._ptr = lib.createTriMeshEnvironment(size, size)
+        self._size = size
+        self._nChannels = lib.getChannelCount(self._ptr)
+        self._buf    = (c_float * (size * size * self._nChannels))()
+        self._reward = c_float(0.0)
+        self._done   = c_bool(False)
+
+        # Stats mirroring AbstractMeshEnv interface.
+        self._total_reward = 0.0
+        self._total_steps  = 0
+        self._actions: list = []
+
+    # ------------------------------------------------------------------
+    # Core interface
+    # ------------------------------------------------------------------
 
     def reset(self):
-        pass # TODO reset using cpp
+        self._lib.reset(self._ptr)
+        self._total_reward = 0.0
+        self._total_steps  = 0
+        self._actions.clear()
+        self._lib.getState(self._ptr, self._buf)
+        return self._buf_to_hwc()
 
-    def step(self,action):
-        nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
-        data = (c_float*(self.getSizeX()*self.getSizeY()*nChannels))()
-        self._reLeMeshLib.step(self._testTriEnv,int(action),data)
-        state = np.zeros([self._yRes,self._xRes,2])
-        index = 0
-        for i in range(nChannels):
-            for j in range(self.getSizeX()):
-                for k in range(self.getSizeY()):
-                    state[j,k,i] = data[index]
-                    index += 1
-        reward = 0.5
-        done = False
-        return self.getState(),reward,done
-    
+    def step(self, action):
+        self._lib.step(self._ptr, int(action),
+                       byref(self._reward), byref(self._done), self._buf)
+        state  = self._buf_to_hwc()
+        reward = float(self._reward.value)
+        done   = bool(self._done.value)
+        self._total_reward += reward
+        self._total_steps  += 1
+        self._actions.append(action)
+        return state, reward, done
+
     def getState(self):
-        nChannels = self._reLeMeshLib.getChannelCount(self._testTriEnv)
-        print(nChannels)
-        print(self.getSizeX())
-        print(self.getSizeY())
-        data = (c_float*(self.getSizeX()*self.getSizeY()*nChannels))()
-        print("Created Memory")
-        self._reLeMeshLib.getState(self._testTriEnv,data)
-        print("Got State")
-        index = 0
+        self._lib.getState(self._ptr, self._buf)
+        return self._buf_to_hwc()
 
-        state = np.zeros([self._yRes,self._xRes,2])
-        for i in range(nChannels):
-            for j in range(self.getSizeX()):
-                for k in range(self.getSizeY()):
-                    state[j,k,i] = data[index]
-                    index += 1
-        return state
+    # ------------------------------------------------------------------
+    # Environment metadata
+    # ------------------------------------------------------------------
+
     def getActionCount(self):
-        return 3 #TODO
+        # C++ getActionCount() returns action *history* size, not available actions.
+        # The environment supports exactly 9 actions (0-7: move corners, 8: new hero).
+        return 9
+
+    def getNumberOfChannels(self):
+        return self._nChannels
+
+    def getSizeX(self):
+        return self._size
+
+    def getSizeY(self):
+        return self._size
+
     def getMaxNumberOfHeros(self):
-        return 1000 #TODO
+        # data arg exists in C++ signature but is unused; pass NULL.
+        return int(self._lib.getMaxNumberOfHeros(self._ptr, None))
+
+    # ------------------------------------------------------------------
+    # Diagnostics
+    # ------------------------------------------------------------------
+
+    def printStats(self):
+        print(f'Steps: {self._total_steps}  Reward: {self._total_reward:.4f}  '
+              f'Actions: {self._actions[-10:]}')
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _buf_to_hwc(self):
+        """Convert the C++ CHW flat buffer to a numpy HWC array."""
+        arr = np.frombuffer(self._buf, dtype=np.float32).copy()
+        arr = arr.reshape(self._nChannels, self._size, self._size)
+        return arr.transpose(1, 2, 0)   # [C, X, Y] → [X, Y, C]
+
+    def __del__(self):
+        if getattr(self, '_lib', None) and getattr(self, '_ptr', None):
+            self._lib.deleteEnvironment(self._ptr)
+            self._ptr = None

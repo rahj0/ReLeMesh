@@ -116,7 +116,10 @@ class BasicEnvironmentRender():
         pixelsNorth = self.computePixelsFromLine(northEastCornerX,northEastCornerY,northWestCornerX,northWestCornerY)
         pixelsEast = self.computePixelsFromLine(southEastCornerX,southEastCornerY,northEastCornerX,northEastCornerY)
         
-        if item.getName() == "hero":
+        # Only check for degenerate apex position on the active (channel=0) hero.
+        # Placed triangles keep name='hero' but channel=1; running this check on
+        # them can spuriously abort the render and freeze the visible state.
+        if item.getName() == "hero" and item.channel == 0:
             wrongMove = False
             if [northWestCornerX,northWestCornerY] in pixelsWest[:-1]:
                 wrongMove = True

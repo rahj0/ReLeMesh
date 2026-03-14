@@ -131,13 +131,10 @@ class triMesherEnv(AbstractMeshEnv):
         return reward   
 
     def createNewHero(self):
-
         starter = self.startObjects[0]
         self.startObjects.pop(0)
-        
         hero = triObj(starter.getNorthWest(),starter.getNorthEast(),1,0,None,'hero')
         (hero,outOfbound) = self.resizeObjToFitEnv(hero)
-    
         self.objects.append(hero)
         return hero
     
